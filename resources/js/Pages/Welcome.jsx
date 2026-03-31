@@ -771,7 +771,7 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
 
             <article className={`rounded-2xl border overflow-hidden transition hover:shadow-md flex flex-col ${cardClass}`}>
                 {/* Image carousel */}
-                <div className="relative w-full aspect-[16/10] bg-slate-100 group flex-shrink-0">
+                <div className="relative h-52 w-full bg-slate-100 group flex-shrink-0 sm:h-56 lg:h-52 xl:h-56">
                     {badge && (
                         <span className="absolute top-2 left-2 z-10 rounded-full bg-emerald-500 px-2 py-1 text-xs font-semibold text-white shadow">
                             {badge}
