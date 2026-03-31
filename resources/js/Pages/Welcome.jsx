@@ -782,12 +782,12 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                         <img
                             src={images[current]}
                             alt={product.name}
-                            className="h-full w-full bg-white p-3 object-contain object-center cursor-zoom-in"
+                            className="h-full w-full object-cover object-center cursor-zoom-in"
                             onClick={openLightbox}
                             onError={() => setImageFailed(true)}
                         />
                     ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-white text-4xl sm:text-5xl">
+                        <div className="flex h-full w-full items-center justify-center bg-slate-50 text-4xl sm:text-5xl">
                             {product.emoji ?? '📦'}
                         </div>
                     )}
