@@ -1,12 +1,9 @@
 import React from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head } from '@inertiajs/react';
+import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function PreferencesSuccess() {
     return (
-        <GuestLayout>
-            <Head title="Preferences Updated" />
-
+        <PublicLayout title="Preferences Updated">
             <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md mx-auto">
                     <div className="bg-white rounded-lg shadow-lg p-8 text-center">
@@ -27,6 +24,6 @@ export default function PreferencesSuccess() {
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </PublicLayout>
     );
 }

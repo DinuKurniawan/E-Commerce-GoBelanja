@@ -1,6 +1,6 @@
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import GuestLayout from '@/Layouts/GuestLayout';
+import PublicLayout from '@/Layouts/PublicLayout';
 import CountdownTimer from '@/Components/CountdownTimer';
 
 export default function FlashSales({ auth, flashSales }) {
@@ -8,22 +8,20 @@ export default function FlashSales({ auth, flashSales }) {
         router.post(route('user.cart.store'), { product_id: productId, quantity: 1 });
     };
 
-    const Layout = auth?.user ? AuthenticatedLayout : GuestLayout;
+    const content = (
+        <div className="py-8 sm:py-10 lg:py-12">
+            <div className="px-4 sm:px-6 lg:px-8">
+                {!auth?.user && (
+                    <div className="mb-6 rounded-3xl bg-gradient-to-r from-red-600 via-orange-500 to-amber-400 px-6 py-8 text-white shadow-lg sm:px-8">
+                        <h1 className="text-3xl font-bold md:text-4xl">⚡ Flash Sale - Penawaran Terbatas!</h1>
+                        <p className="mt-2 max-w-2xl text-sm text-white/90 sm:text-base">
+                            Pantau promo aktif, stok terbatas, dan diskon spesial yang sedang berlangsung sekarang.
+                        </p>
+                    </div>
+                )}
 
-    return (
-        <Layout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    ⚡ Flash Sale - Penawaran Terbatas!
-                </h2>
-            }
-        >
-            <Head title="Flash Sale" />
-
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {flashSales.length === 0 ? (
-                        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+                        <div className="rounded-lg bg-white p-12 text-center shadow-sm">
                             <div className="text-6xl mb-4">⚡</div>
                             <h3 className="text-2xl font-bold text-gray-800 mb-2">
                                 Tidak Ada Flash Sale Aktif
@@ -33,7 +31,7 @@ export default function FlashSales({ auth, flashSales }) {
                             </p>
                         </div>
                     ) : (
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                             {flashSales.map((flashSale) => {
                                 const product = flashSale.product;
                                 const isSoldOut = flashSale.max_quantity && 
@@ -147,7 +145,22 @@ export default function FlashSales({ auth, flashSales }) {
                         </div>
                     )}
                 </div>
-            </div>
-        </Layout>
+        </div>
+    );
+
+    return auth?.user ? (
+        <AuthenticatedLayout
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    ⚡ Flash Sale - Penawaran Terbatas!
+                </h2>
+            }
+        >
+            {content}
+        </AuthenticatedLayout>
+    ) : (
+        <PublicLayout title="Flash Sale">
+            {content}
+        </PublicLayout>
     );
 }

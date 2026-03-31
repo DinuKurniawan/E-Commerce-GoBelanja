@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
+import PublicLayout from '@/Layouts/PublicLayout';
 
 function StarRating({ value, size = 'text-lg' }) {
     return (
@@ -131,14 +131,13 @@ export default function ProductReviews({ product, reviews, ratingStats, filters 
     };
 
     return (
-        <GuestLayout>
-            <Head title={`Reviews - ${product.name}`} />
-            <div className="max-w-7xl mx-auto px-4 py-8">
+        <PublicLayout title={`Reviews - ${product.name}`}>
+            <div className="px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-8">
                     <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-800 mb-2 inline-block">← Kembali ke Produk</Link>
                     <h1 className="text-2xl font-bold text-slate-900">{product.name}</h1>
                 </div>
-                <div className="grid lg:grid-cols-[300px_1fr] gap-6">
+                <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
                     <div className="space-y-6">
                         <div className="bg-white rounded-lg border border-slate-200 p-6">
                             <div className="text-center mb-4">
@@ -172,8 +171,8 @@ export default function ProductReviews({ product, reviews, ratingStats, filters 
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-lg border border-slate-200 p-6">
-                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
+                    <div className="bg-white rounded-lg border border-slate-200 p-4 sm:p-6">
+                        <div className="mb-6 flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
                             <h2 className="text-lg font-semibold text-slate-900">Customer Reviews ({ratingStats.total})</h2>
                             <select value={currentFilters.sort} onChange={(e) => updateFilter('sort', e.target.value)} className="text-sm border-slate-300 rounded-lg">
                                 <option value="recent">Most Recent</option>
@@ -201,6 +200,6 @@ export default function ProductReviews({ product, reviews, ratingStats, filters 
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </PublicLayout>
     );
 }

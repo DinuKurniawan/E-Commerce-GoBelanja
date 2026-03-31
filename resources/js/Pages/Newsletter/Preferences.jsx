@@ -1,6 +1,6 @@
 import React from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import PublicLayout from '@/Layouts/PublicLayout';
+import { useForm } from '@inertiajs/react';
 
 export default function Preferences({ subscriber, token }) {
     const { data, setData, post, processing } = useForm({
@@ -15,9 +15,7 @@ export default function Preferences({ subscriber, token }) {
     };
 
     return (
-        <GuestLayout>
-            <Head title="Email Preferences" />
-
+        <PublicLayout title="Email Preferences">
             <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl mx-auto">
                     <div className="bg-white rounded-lg shadow-lg p-8">
@@ -122,6 +120,6 @@ export default function Preferences({ subscriber, token }) {
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </PublicLayout>
     );
 }

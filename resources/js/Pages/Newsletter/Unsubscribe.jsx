@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import PublicLayout from '@/Layouts/PublicLayout';
+import { useForm } from '@inertiajs/react';
 
 export default function Unsubscribe({ email, token }) {
     const [reason, setReason] = useState('');
@@ -14,9 +14,7 @@ export default function Unsubscribe({ email, token }) {
     };
 
     return (
-        <GuestLayout>
-            <Head title="Unsubscribe from Newsletter" />
-
+        <PublicLayout title="Unsubscribe from Newsletter">
             <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md mx-auto">
                     <div className="bg-white rounded-lg shadow-lg p-8">
@@ -84,6 +82,6 @@ export default function Unsubscribe({ email, token }) {
                     </div>
                 </div>
             </div>
-        </GuestLayout>
+        </PublicLayout>
     );
 }
