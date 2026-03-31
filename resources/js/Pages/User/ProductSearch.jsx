@@ -1,7 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import GuestLayout from '@/Layouts/GuestLayout';
 import SearchBar from '@/Components/SearchBar';
 import ProductFilters from '@/Components/ProductFilters';
 import { StarIcon, ShoppingCartIcon, HeartIcon, XMarkIcon } from '@heroicons/react/24/solid';
@@ -125,14 +124,45 @@ export default function ProductSearch({
 
     const activeFilters = getActiveFilters();
 
-    const Layout = auth.user ? AuthenticatedLayout : GuestLayout;
-
     const pageContent = (
         <>
             <Head title="Cari Produk" />
 
-            <div className="min-h-screen bg-gray-50 py-8">
+            <div className="min-h-screen bg-slate-50 py-8">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    {!auth.user && (
+                        <div className="mb-6 overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 text-white shadow-lg">
+                            <div className="flex flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between md:px-8">
+                                <div className="max-w-2xl">
+                                    <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-white/90 hover:text-white">
+                                        ← Kembali ke Beranda
+                                    </Link>
+                                    <h1 className="mt-3 text-3xl font-bold md:text-4xl">
+                                        Cari Produk & Flash Sale
+                                    </h1>
+                                    <p className="mt-2 text-sm text-white/85 md:text-base">
+                                        Jelajahi produk terbaik, filter lebih cepat, dan temukan promo yang sedang aktif.
+                                    </p>
+                                </div>
+
+                                <div className="flex flex-wrap gap-3">
+                                    <Link
+                                        href={route('login')}
+                                        className="rounded-xl border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+                                    >
+                                        Masuk
+                                    </Link>
+                                    <Link
+                                        href={route('register')}
+                                        className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-slate-100"
+                                    >
+                                        Daftar
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Search Bar */}
                     <div className="mb-6">
                         <SearchBar 
@@ -169,7 +199,7 @@ export default function ProductSearch({
                     )}
 
                     {/* Main Content */}
-                    <div className="lg:grid lg:grid-cols-4 lg:gap-8">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-4 lg:gap-8">
                         {/* Filters Sidebar */}
                         <div className="lg:col-span-1">
                             <ProductFilters
@@ -183,10 +213,13 @@ export default function ProductSearch({
                         {/* Products Grid */}
                         <div className="mt-6 lg:col-span-3 lg:mt-0">
                             {/* Results Header */}
-                            <div className="mb-4 flex items-center justify-between">
+                            <div className="mb-4 flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:flex-row sm:items-center sm:justify-between">
                                 <p className="text-sm text-gray-600">
                                     Menampilkan <span className="font-semibold">{products.data.length}</span> dari{' '}
                                     <span className="font-semibold">{products.total}</span> produk
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                    Urutkan dan filter produk untuk hasil yang lebih relevan.
                                 </p>
                             </div>
 
@@ -237,7 +270,7 @@ export default function ProductSearch({
     );
 
     return auth.user ? (
-        <Layout
+        <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     Cari Produk
@@ -245,9 +278,9 @@ export default function ProductSearch({
             }
         >
             {pageContent}
-        </Layout>
+        </AuthenticatedLayout>
     ) : (
-        <GuestLayout>{pageContent}</GuestLayout>
+        pageContent
     );
 }
 
