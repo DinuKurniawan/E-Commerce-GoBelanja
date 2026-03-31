@@ -25,6 +25,7 @@ export default function AuthenticatedLayout({ header, children }) {
                   { label: 'Promo', routeName: 'admin.promotions.index' },
                   { label: 'Flash Sale', routeName: 'admin.flash-sales.index' },
                   { label: 'Shipping', routeName: 'admin.shipping.index' },
+                  { label: 'Retur', routeName: 'admin.returns.index' },
                   { label: 'Review', routeName: 'admin.reviews.index' },
                   { label: 'Chat', routeName: 'admin.chat.index' },
                   { label: 'Reports', routeName: 'admin.reports.index' },
@@ -41,6 +42,7 @@ export default function AuthenticatedLayout({ header, children }) {
                   { label: 'Perbandingan', routeName: 'user.comparison.index' },
                   { label: 'Alamat', routeName: 'user.addresses.index' },
                   { label: 'Pembayaran', routeName: 'user.payments.index' },
+                  { label: 'Retur & Refund', routeName: 'user.returns.index' },
                   { label: 'Review Produk', routeName: 'user.reviews.index' },
                   { label: 'Notifikasi', routeName: 'user.notifications.index' },
               ];

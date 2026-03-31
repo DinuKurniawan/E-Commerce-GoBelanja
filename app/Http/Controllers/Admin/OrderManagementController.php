@@ -25,7 +25,7 @@ class OrderManagementController extends Controller
     {
         return Inertia::render('Admin/Orders', [
             'orders'   => Order::query()
-                ->with(['user:id,name,email', 'payment', 'deliverySchedule'])
+                ->with(['user:id,name,email', 'payment', 'deliverySchedule', 'returnRequests'])
                 ->latest()
                 ->get(),
             'statuses' => ['pending', 'diproses', 'dikirim', 'selesai'],

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 const STATUS_COLOR = {
@@ -20,6 +20,188 @@ const PAYMENT_LABEL = {
     paid:                 'Lunas',
     failed:               'Bukti Ditolak',
 };
+
+const RETURN_STATUS = {
+    requested: { label: 'Menunggu Review', color: 'bg-orange-100 text-orange-700' },
+    approved: { label: 'Disetujui', color: 'bg-blue-100 text-blue-700' },
+    rejected: { label: 'Ditolak', color: 'bg-rose-100 text-rose-700' },
+    received: { label: 'Barang Diterima', color: 'bg-violet-100 text-violet-700' },
+    refunded: { label: 'Refund Diproses', color: 'bg-emerald-100 text-emerald-700' },
+    completed: { label: 'Selesai', color: 'bg-slate-900 text-white' },
+};
+
+function ReturnRequestForm({ order, items, existingReturnRequests }) {
+    const [preview, setPreview] = useState(null);
+    const [open, setOpen] = useState(false);
+    const form = useForm({
+        reason: '',
+        customer_notes: '',
+        evidence_image: null,
+        items: items.map((item) => ({
+            order_item_id: item.id,
+            quantity: 0,
+        })),
+    });
+
+    const hasActiveRequest = (orderItemId) =>
+        (existingReturnRequests ?? []).some((request) =>
+            request.status !== 'rejected' &&
+            (request.items ?? []).some((requestItem) => requestItem.order_item_id === orderItemId),
+        );
+
+    const submit = (event) => {
+        event.preventDefault();
+        form.post(route('user.orders.returns.store', order.id), {
+            forceFormData: true,
+            onSuccess: () => {
+                setOpen(false);
+                setPreview(null);
+                form.reset();
+            },
+        });
+    };
+
+    const updateQty = (itemId, quantity) => {
+        form.setData('items', form.data.items.map((item) => (
+            item.order_item_id === itemId ? { ...item, quantity: Number(quantity) } : item
+        )));
+    };
+
+    const selectedCount = form.data.items.filter((item) => Number(item.quantity) > 0).length;
+
+    return (
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h3 className="font-semibold text-slate-900">Retur & Refund</h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                        Ajukan retur untuk item bermasalah dan pantau proses refund langsung dari akun Anda.
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onClick={() => setOpen((value) => !value)}
+                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                >
+                    {open ? 'Tutup Form' : 'Ajukan Retur'}
+                </button>
+            </div>
+
+            {(existingReturnRequests ?? []).length > 0 && (
+                <div className="mt-4 space-y-3">
+                    {(existingReturnRequests ?? []).map((request) => {
+                        const status = RETURN_STATUS[request.status] ?? { label: request.status, color: 'bg-slate-100 text-slate-700' };
+
+                        return (
+                            <div key={request.id} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900">{request.request_number}</p>
+                                        <p className="text-sm text-slate-600">{request.reason}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${status.color}`}>{status.label}</span>
+                                        <Link href={route('user.returns.show', request.id)} className="text-xs font-semibold text-indigo-600 hover:text-indigo-500">
+                                            Lihat tracking →
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {open && (
+                <form onSubmit={submit} className="mt-5 space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-slate-700">Alasan retur</label>
+                        <input
+                            type="text"
+                            value={form.data.reason}
+                            onChange={(e) => form.setData('reason', e.target.value)}
+                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            placeholder="Contoh: produk rusak / ukuran tidak sesuai / salah kirim"
+                            required
+                        />
+                        {form.errors.reason && <p className="mt-1 text-xs text-rose-600">{form.errors.reason}</p>}
+                    </div>
+
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-slate-700">Catatan tambahan</label>
+                        <textarea
+                            rows={3}
+                            value={form.data.customer_notes}
+                            onChange={(e) => form.setData('customer_notes', e.target.value)}
+                            className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
+                            placeholder="Jelaskan kondisi barang yang diterima."
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-1 block text-sm font-medium text-slate-700">Bukti foto</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null;
+                                form.setData('evidence_image', file);
+                                setPreview(file ? URL.createObjectURL(file) : null);
+                            }}
+                            className="block w-full text-sm text-slate-600"
+                        />
+                        {preview && <img src={preview} alt="Preview retur" className="mt-3 h-48 w-full rounded-xl border border-slate-200 bg-white object-contain" />}
+                        {form.errors.evidence_image && <p className="mt-1 text-xs text-rose-600">{form.errors.evidence_image}</p>}
+                    </div>
+
+                    <div>
+                        <p className="mb-2 text-sm font-medium text-slate-700">Pilih item yang diretur</p>
+                        <div className="space-y-3">
+                            {items.map((item) => {
+                                const disabled = hasActiveRequest(item.id);
+                                return (
+                                    <div key={item.id} className={`rounded-xl border px-4 py-3 ${disabled ? 'border-slate-200 bg-slate-100' : 'border-slate-200 bg-white'}`}>
+                                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                            <div>
+                                                <p className="font-medium text-slate-900">{item.product?.name}</p>
+                                                <p className="text-sm text-slate-500">Dibeli: {item.quantity} pcs</p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <label className="text-sm text-slate-600">Qty retur</label>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max={item.quantity}
+                                                    disabled={disabled}
+                                                    value={form.data.items.find((entry) => entry.order_item_id === item.id)?.quantity ?? 0}
+                                                    onChange={(e) => updateQty(item.id, e.target.value)}
+                                                    className="w-24 rounded-lg border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-200"
+                                                />
+                                            </div>
+                                        </div>
+                                        {disabled && <p className="mt-2 text-xs font-medium text-slate-500">Item ini sudah memiliki retur aktif.</p>}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        {form.errors.items && <p className="mt-1 text-xs text-rose-600">{form.errors.items}</p>}
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-sm text-slate-500">{selectedCount} item dipilih untuk diretur.</p>
+                        <button
+                            type="submit"
+                            disabled={form.processing || selectedCount === 0}
+                            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-60"
+                        >
+                            {form.processing ? 'Mengirim...' : 'Kirim Permintaan Retur'}
+                        </button>
+                    </div>
+                </form>
+            )}
+        </div>
+    );
+}
 
 /* ── Review Form ─────────────────────────────────────── */
 function ReviewForm({ item, existingReview }) {
@@ -223,12 +405,13 @@ function PaymentProofUpload({ paymentId, canReupload }) {
 }
 
 /* ── Main Page ───────────────────────────────────────── */
-export default function UserOrderShow({ order, userReviews }) {
+export default function UserOrderShow({ order, userReviews, returnRequests }) {
     const { flash } = usePage().props;
     const items    = order?.items ?? [];
     const payment  = order?.payment;
     const reviews  = userReviews ?? {};
     const deliverySchedule = order?.delivery_schedule;
+    const existingReturnRequests = returnRequests ?? [];
     const isSelesai = order?.status === 'selesai';
     const isCOD    = payment?.method?.toLowerCase().includes('cod');
 
@@ -458,7 +641,10 @@ export default function UserOrderShow({ order, userReviews }) {
 
                     {/* Bukti penerimaan paket */}
                     {isSelesai && (
-                        <DeliveryProofUpload orderId={order.id} existingProof={order.delivery_proof} />
+                        <>
+                            <DeliveryProofUpload orderId={order.id} existingProof={order.delivery_proof} />
+                            <ReturnRequestForm order={order} items={items} existingReturnRequests={existingReturnRequests} />
+                        </>
                     )}
                 </div>
             </div>

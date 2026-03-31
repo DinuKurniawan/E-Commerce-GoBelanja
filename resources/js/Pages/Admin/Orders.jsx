@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import useConfirm from '@/Hooks/useConfirm';
 
@@ -103,12 +103,13 @@ export default function Orders({ orders, statuses }) {
                                 {orderList.map((order) => {
                                     const statusInfo  = STATUS_MAP[order.status]         ?? { label: order.status,         color: 'bg-slate-100 text-slate-700' };
                                     const payInfo     = PAYMENT_MAP[order.payment_status] ?? { label: order.payment_status, color: 'bg-slate-100 text-slate-700' };
-                                    const proof       = order.payment?.proof_image;
-                                    const needsVerify = order.payment_status === 'menunggu_verifikasi' && proof;
+                                     const proof       = order.payment?.proof_image;
+                                     const needsVerify = order.payment_status === 'menunggu_verifikasi' && proof;
+                                     const hasReturnRequest = (order.return_requests?.length ?? 0) > 0;
 
                                     return (
                                         <tr key={order.id} className={`border-t border-slate-100 transition ${needsVerify ? 'bg-blue-50' : 'hover:bg-slate-50'}`}>
-                                            <td className="px-4 py-3 font-medium text-slate-900">{order.order_number}</td>
+                                             <td className="px-4 py-3 font-medium text-slate-900">{order.order_number}</td>
                                             <td className="px-4 py-3 text-slate-600">
                                                 <p>{order.user?.name ?? '-'}</p>
                                                 <p className="text-xs text-slate-400">{order.user?.email}</p>
@@ -168,8 +169,16 @@ export default function Orders({ orders, statuses }) {
                                                     <span className="text-xs text-slate-400">Belum ada</span>
                                                 )}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex flex-wrap gap-1.5">
+                                             <td className="px-4 py-3">
+                                                 {hasReturnRequest && (
+                                                     <Link
+                                                         href={route('admin.returns.show', order.return_requests[0].id)}
+                                                         className="mb-2 inline-flex rounded-md bg-violet-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-violet-500"
+                                                     >
+                                                         Retur Aktif
+                                                     </Link>
+                                                 )}
+                                                 <div className="flex flex-wrap gap-1.5">
                                                     {statusList.map((status) => (
                                                         <button
                                                             key={status}
@@ -191,7 +200,7 @@ export default function Orders({ orders, statuses }) {
                                 })}
                                 {orderList.length === 0 && (
                                     <tr>
-                                        <td className="px-4 py-10 text-center text-slate-500" colSpan={7}>
+                                        <td className="px-4 py-10 text-center text-slate-500" colSpan={8}>
                                             Belum ada data order.
                                         </td>
                                     </tr>

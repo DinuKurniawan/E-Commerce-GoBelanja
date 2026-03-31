@@ -84,6 +84,11 @@ class Order extends Model
         return $this->hasMany(StockHistory::class);
     }
 
+    public function returnRequests(): HasMany
+    {
+        return $this->hasMany(ReturnRequest::class)->latest();
+    }
+
     public function promotionUsages(): HasMany
     {
         return $this->hasMany(PromotionUsage::class);

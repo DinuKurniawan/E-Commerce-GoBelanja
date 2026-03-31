@@ -48,8 +48,10 @@ use App\Http\Controllers\Admin\IpBlockingController;
 use App\Http\Controllers\Admin\SecurityDashboardController;
 use App\Http\Controllers\Admin\BannerManagementController;
 use App\Http\Controllers\User\LoyaltyController;
+use App\Http\Controllers\User\ReturnRequestController;
 use App\Http\Controllers\User\DeliveryScheduleController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\Admin\ReturnRequestManagementController;
 use Illuminate\Support\Facades\Route;
 
 // Locale Routes (Public)
@@ -177,6 +179,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::patch('/orders/{order}/status', [OrderManagementController::class, 'updateStatus'])->name('orders.update-status');
         Route::patch('/orders/{order}/verify-payment', [OrderManagementController::class, 'verifyPayment'])->name('orders.verify-payment');
         Route::post('/orders/{order}/cancel', [OrderManagementController::class, 'cancelOrder'])->name('orders.cancel');
+        Route::get('/returns', [ReturnRequestManagementController::class, 'index'])->name('returns.index');
+        Route::get('/returns/{returnRequest}', [ReturnRequestManagementController::class, 'show'])->name('returns.show');
+        Route::patch('/returns/{returnRequest}/status', [ReturnRequestManagementController::class, 'updateStatus'])->name('returns.update-status');
+        Route::get('/returns', [ReturnRequestManagementController::class, 'index'])->name('returns.index');
+        Route::get('/returns/{returnRequest}', [ReturnRequestManagementController::class, 'show'])->name('returns.show');
+        Route::patch('/returns/{returnRequest}/status', [ReturnRequestManagementController::class, 'updateStatus'])->name('returns.update-status');
 
         // Inventory Management Routes
         Route::get('/inventory', [\App\Http\Controllers\Admin\InventoryController::class, 'index'])->name('inventory.index');
@@ -296,6 +304,12 @@ Route::middleware(['auth', 'verified', 'role:user'])
         Route::get('/orders', [UserOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [UserOrderController::class, 'show'])->name('orders.show');
         Route::post('/orders/{order}/delivery-proof', [UserOrderController::class, 'uploadDeliveryProof'])->name('orders.delivery-proof');
+        Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])->name('orders.returns.store');
+        Route::get('/returns', [ReturnRequestController::class, 'index'])->name('returns.index');
+        Route::get('/returns/{returnRequest}', [ReturnRequestController::class, 'show'])->name('returns.show');
+        Route::post('/orders/{order}/returns', [ReturnRequestController::class, 'store'])->name('orders.returns.store');
+        Route::get('/returns', [ReturnRequestController::class, 'index'])->name('returns.index');
+        Route::get('/returns/{returnRequest}', [ReturnRequestController::class, 'show'])->name('returns.show');
 
         Route::get('/wishlist', [UserWishlistController::class, 'index'])->name('wishlist.index');
         Route::post('/wishlist', [UserWishlistController::class, 'store'])->name('wishlist.store');

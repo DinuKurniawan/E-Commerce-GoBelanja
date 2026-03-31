@@ -90,6 +90,14 @@ export default function UserOrdersIndex({ orders, orderSummary }) {
                                                             📎 Upload Bukti
                                                         </Link>
                                                     )}
+                                                    {(order.return_requests?.length ?? 0) > 0 && (
+                                                        <Link
+                                                            href={route('user.returns.show', order.return_requests[0].id)}
+                                                            className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500"
+                                                        >
+                                                            ↩ Lihat Retur
+                                                        </Link>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

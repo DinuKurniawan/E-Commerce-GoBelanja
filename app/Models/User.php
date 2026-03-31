@@ -118,4 +118,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(ReviewVote::class);
     }
+
+    public function returnRequests(): HasMany
+    {
+        return $this->hasMany(ReturnRequest::class);
+    }
 }
