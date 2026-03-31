@@ -770,7 +770,7 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
 
             <article className={`rounded-2xl border overflow-hidden transition hover:shadow-md flex flex-col ${cardClass}`}>
                 {/* Image carousel */}
-                <div className="relative w-full aspect-[4/3] bg-slate-100 group flex-shrink-0">
+                <div className="relative w-full aspect-[16/10] bg-slate-100 group flex-shrink-0">
                     {badge && (
                         <span className="absolute top-2 left-2 z-10 rounded-full bg-emerald-500 px-2 py-1 text-xs font-semibold text-white shadow">
                             {badge}
@@ -781,12 +781,12 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                         <img
                             src={images[current]}
                             alt={product.name}
-                            className="h-full w-full object-cover cursor-zoom-in"
+                            className="h-full w-full object-cover object-center cursor-zoom-in"
                             onClick={openLightbox}
                             onError={(e) => { e.target.style.display = 'none'; }}
                         />
                     ) : (
-                        <div className="h-full w-full flex items-center justify-center text-5xl">
+                        <div className="flex h-full w-full items-center justify-center text-4xl sm:text-5xl">
                             {product.emoji ?? '📦'}
                         </div>
                     )}
@@ -814,7 +814,7 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                 </div>
 
             {/* Content */}
-            <div className="p-4 flex flex-col flex-1">
+            <div className="flex flex-1 flex-col p-4 lg:p-5">
                 <p className="font-semibold leading-snug">{product.name}</p>
                 <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                     {product.category?.name}
