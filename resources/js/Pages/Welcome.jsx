@@ -412,7 +412,7 @@ export default function Welcome({
                                                         ? banner.image
                                                         : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                     alt={banner.title}
-                                                    className="w-full h-[220px] bg-slate-100 object-contain object-center sm:h-[320px] md:h-[400px]"
+                                                    className="w-full h-[220px] object-cover object-center sm:h-[320px] md:h-[400px]"
                                                 />
                                             </a>
                                         ) : (
@@ -421,7 +421,7 @@ export default function Welcome({
                                                     ? banner.image
                                                     : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                 alt={banner.title}
-                                                className="w-full h-[220px] bg-slate-100 object-contain object-center sm:h-[320px] md:h-[400px]"
+                                                className="w-full h-[220px] object-cover object-center sm:h-[320px] md:h-[400px]"
                                             />
                                         )}
                                         {/* Overlay text */}
