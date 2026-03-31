@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg2)"/>
+  <circle cx="210" cy="120" r="130" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="1450" cy="370" r="120" fill="rgba(255,255,255,0.08)"/>
+  <text x="110" y="180" fill="#ffffff" font-size="68" font-family="Arial, sans-serif" font-weight="700">Flash Sale &amp; Diskon Besar</text>
+  <text x="110" y="255" fill="#fff7ed" font-size="34" font-family="Arial, sans-serif">Temukan penawaran spesial dan hemat hingga 70%</text>
+</svg>

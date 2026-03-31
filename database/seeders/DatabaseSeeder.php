@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Essential structural data only — no fake orders/transactions.
-        $this->call([
-            UserSeeder::class,          // Admin + user account for login
-            CategorySeeder::class,      // Product categories
-            StoreSettingSeeder::class,  // Store name, payment methods
-            ShippingMethodSeeder::class, // Courier options for checkout
-        ]);
-    }
-}
+         $this->call([
+             UserSeeder::class,          // Admin + user account for login
+             CategorySeeder::class,      // Product categories
+             StoreSettingSeeder::class,  // Store name, payment methods
+             ShippingMethodSeeder::class, // Courier options for checkout
+             BannerSeeder::class,        // Default homepage banners
+         ]);
+     }
+ }

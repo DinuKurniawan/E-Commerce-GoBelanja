@@ -46,7 +46,9 @@ export default function Banners({ banners }) {
             target_blank: !!banner.target_blank,
             is_active: !!banner.is_active,
         });
-        setImagePreview(`/storage/${banner.image}`);
+        setImagePreview(banner.image.startsWith('http') || banner.image.startsWith('/')
+            ? banner.image
+            : `/storage/${banner.image}`);
         setImageFile(null);
         setShowForm(true);
     };
@@ -264,7 +266,9 @@ export default function Banners({ banners }) {
 
                                 {/* Image */}
                                 <img
-                                    src={`/storage/${banner.image}`}
+                                    src={banner.image.startsWith('http') || banner.image.startsWith('/')
+                                        ? banner.image
+                                        : `/storage/${banner.image}`}
                                     alt={banner.title}
                                     className="h-20 w-36 rounded-lg object-cover border flex-shrink-0"
                                 />

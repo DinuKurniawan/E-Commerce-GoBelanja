@@ -360,14 +360,18 @@ export default function Welcome({
                                                 rel={banner.target_blank ? 'noopener noreferrer' : undefined}
                                             >
                                                 <img
-                                                    src={`/storage/${banner.image}`}
+                                                    src={banner.image.startsWith('http') || banner.image.startsWith('/')
+                                                        ? banner.image
+                                                        : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                     alt={banner.title}
                                                     className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
                                                 />
                                             </a>
                                         ) : (
                                             <img
-                                                src={`/storage/${banner.image}`}
+                                                src={banner.image.startsWith('http') || banner.image.startsWith('/')
+                                                    ? banner.image
+                                                    : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                 alt={banner.title}
                                                 className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
                                             />
