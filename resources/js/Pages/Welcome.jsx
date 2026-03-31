@@ -425,16 +425,18 @@ export default function Welcome({
                                             />
                                         )}
                                         {/* Overlay text */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end">
-                                            <div className="p-6 sm:p-8">
-                                                <h2 className="text-xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent">
+                                            <div className="flex h-full items-end px-6 pb-8 sm:px-10 sm:pb-10 lg:px-16 lg:pb-14">
+                                                <div className="max-w-3xl">
+                                                <h2 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg">
                                                     {banner.title}
                                                 </h2>
                                                 {banner.subtitle && (
-                                                    <p className="mt-1 text-sm sm:text-lg text-white/90 drop-shadow">
+                                                    <p className="mt-2 max-w-2xl text-sm sm:text-lg text-white/90 drop-shadow">
                                                         {banner.subtitle}
                                                     </p>
                                                 )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
