@@ -364,7 +364,7 @@ export default function Welcome({
                                                         ? banner.image
                                                         : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                     alt={banner.title}
-                                                    className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
+                                                    className="w-full h-[220px] bg-slate-100 object-contain object-center sm:h-[320px] md:h-[400px]"
                                                 />
                                             </a>
                                         ) : (
@@ -373,7 +373,7 @@ export default function Welcome({
                                                     ? banner.image
                                                     : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                 alt={banner.title}
-                                                className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
+                                                className="w-full h-[220px] bg-slate-100 object-contain object-center sm:h-[320px] md:h-[400px]"
                                             />
                                         )}
                                         {/* Overlay text */}
@@ -782,7 +782,7 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                         <img
                             src={images[current]}
                             alt={product.name}
-                            className="h-full w-full object-cover object-center cursor-zoom-in"
+                            className="h-full w-full bg-slate-50 object-contain object-center cursor-zoom-in"
                             onClick={openLightbox}
                             onError={() => setImageFailed(true)}
                         />
