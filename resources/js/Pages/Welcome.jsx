@@ -10,6 +10,13 @@ const features = [
     'Customer support 24/7',
 ];
 
+const highlights = [
+    { label: 'Produk Aktif', icon: '📦' },
+    { label: 'Kategori Pilihan', icon: '🧭' },
+    { label: 'Belanja Aman', icon: '🔒' },
+    { label: 'Pengiriman Cepat', icon: '🚚' },
+];
+
 const formatPrice = (value) => `Rp${Number(value).toLocaleString('id-ID')}`;
 
 export default function Welcome({
@@ -35,6 +42,9 @@ export default function Welcome({
     const cartRef = useRef(null);
     const [currentBanner, setCurrentBanner] = useState(0);
     const bannerTimerRef = useRef(null);
+    const [newsletterEmail, setNewsletterEmail] = useState('');
+    const [newsletterLoading, setNewsletterLoading] = useState(false);
+    const [newsletterFeedback, setNewsletterFeedback] = useState(null);
 
     // Close cart dropdown on outside click
     useEffect(() => {
@@ -77,6 +87,44 @@ export default function Welcome({
 
     const bestSellers = filteredProducts.filter((product) => product.is_popular);
     const newestProducts = filteredProducts.filter((product) => product.is_new);
+
+    async function handleNewsletterSubscribe(e) {
+        e.preventDefault();
+
+        if (!newsletterEmail.trim()) {
+            setNewsletterFeedback({
+                type: 'error',
+                message: 'Masukkan email terlebih dahulu.',
+            });
+            return;
+        }
+
+        setNewsletterLoading(true);
+        setNewsletterFeedback(null);
+
+        try {
+            const response = await window.axios.post(route('newsletter.subscribe'), {
+                email: newsletterEmail.trim(),
+            });
+
+            setNewsletterFeedback({
+                type: 'success',
+                message: response.data?.message ?? 'Berhasil subscribe newsletter.',
+            });
+            setNewsletterEmail('');
+        } catch (error) {
+            const message = error?.response?.data?.message
+                || error?.response?.data?.errors?.email?.[0]
+                || 'Terjadi kesalahan saat subscribe newsletter.';
+
+            setNewsletterFeedback({
+                type: 'error',
+                message,
+            });
+        } finally {
+            setNewsletterLoading(false);
+        }
+    }
 
     function addToCart(product, size = '') {
         if (!auth?.user) {
@@ -452,6 +500,34 @@ export default function Welcome({
                         </section>
                     )}
 
+                    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                        {highlights.map((item, index) => (
+                            <div
+                                key={item.label}
+                                className={`rounded-3xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${cardClass}`}
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span className="text-3xl">{item.icon}</span>
+                                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
+                                        0{index + 1}
+                                    </span>
+                                </div>
+                                <p className={`mt-4 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>
+                                    {item.label}
+                                </p>
+                                <p className="mt-1 text-2xl font-bold">
+                                    {index === 0
+                                        ? products.length
+                                        : index === 1
+                                            ? categories.length
+                                            : index === 2
+                                                ? '100%'
+                                                : '24/7'}
+                                </p>
+                            </div>
+                        ))}
+                    </section>
+
                     {/* Kategori */}
                     <section>
                         <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -647,29 +723,69 @@ export default function Welcome({
                     </section>
 
                     {/* Newsletter */}
-                    <section className={`rounded-3xl border p-8 text-center ${cardClass}`}>
-                        <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                            Subscribe Newsletter
-                        </h2>
-                        <p className={`mt-2 ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>
-                            Dapatkan promo terbaru dari GoBelanja.
-                        </p>
-                        <div className="mx-auto mt-4 flex max-w-xl gap-2">
-                            <input
-                                type="email"
-                                placeholder="Masukkan email Anda"
-                                className={`w-full rounded-xl border px-4 py-2 text-sm focus:outline-none ${
-                                    darkMode
-                                        ? 'border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-400'
-                                        : 'border-slate-300 bg-white text-slate-900 placeholder:text-slate-500'
-                                }`}
-                            />
-                            <button
-                                type="button"
-                                className="rounded-xl bg-indigo-600 px-5 py-2 font-semibold text-white hover:bg-indigo-500"
-                            >
-                                Subscribe
-                            </button>
+                    <section className={`overflow-hidden rounded-3xl border ${cardClass}`}>
+                        <div className={`grid gap-0 lg:grid-cols-[1.2fr_0.8fr]`}>
+                            <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-500 p-8 text-white sm:p-10">
+                                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/75">
+                                    Newsletter GoBelanja
+                                </p>
+                                <h2 className="mt-3 text-3xl font-bold sm:text-4xl">
+                                    Promo terbaru, produk baru, dan penawaran spesial langsung ke inbox.
+                                </h2>
+                                <p className="mt-3 max-w-2xl text-sm text-white/85 sm:text-base">
+                                    Subscribe sekarang untuk dapat info flash sale, rekomendasi produk, dan kabar promo terbaik tanpa perlu ketinggalan.
+                                </p>
+
+                                <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/90">
+                                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">🎁 Promo eksklusif</span>
+                                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">⚡ Update flash sale</span>
+                                    <span className="rounded-full border border-white/20 bg-white/10 px-4 py-2">🛍️ Rekomendasi produk</span>
+                                </div>
+                            </div>
+
+                            <div className={`p-8 sm:p-10 ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                                <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    Subscribe sekarang
+                                </h3>
+                                <p className={`mt-2 text-sm ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                    Cukup masukkan email aktif Anda, kami akan kirim update terbaik dari toko.
+                                </p>
+
+                                <form onSubmit={handleNewsletterSubscribe} className="mt-6 space-y-4">
+                                    <input
+                                        type="email"
+                                        value={newsletterEmail}
+                                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                                        placeholder="Masukkan email Anda"
+                                        className={`w-full rounded-2xl border px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                                            darkMode
+                                                ? 'border-slate-700 bg-slate-950 text-slate-100 placeholder:text-slate-400'
+                                                : 'border-slate-300 bg-white text-slate-900 placeholder:text-slate-500'
+                                        }`}
+                                    />
+
+                                    <button
+                                        type="submit"
+                                        disabled={newsletterLoading}
+                                        className="w-full rounded-2xl bg-indigo-600 px-5 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+                                    >
+                                        {newsletterLoading ? 'Menyimpan...' : 'Subscribe Sekarang'}
+                                    </button>
+                                </form>
+
+                                {newsletterFeedback && (
+                                    <div
+                                        className={`mt-4 rounded-2xl px-4 py-3 text-sm ${
+                                            newsletterFeedback.type === 'success'
+                                                ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                                : 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                                        }`}
+                                    >
+                                        {newsletterFeedback.type === 'success' ? '✅ ' : '⚠️ '}
+                                        {newsletterFeedback.message}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </section>
                 </main>
