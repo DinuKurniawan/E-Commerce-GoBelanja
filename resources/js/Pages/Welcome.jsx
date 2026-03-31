@@ -18,6 +18,7 @@ export default function Welcome({
     categories = [],
     products = [],
     testimonials = [],
+    banners = [],
 }) {
     const { cartPreview, flash } = usePage().props;
     const isUser = auth?.user?.role === 'user';
@@ -32,6 +33,8 @@ export default function Welcome({
     const [cartToast, setCartToast] = useState(null);
     const [showCartDropdown, setShowCartDropdown] = useState(false);
     const cartRef = useRef(null);
+    const [currentBanner, setCurrentBanner] = useState(0);
+    const bannerTimerRef = useRef(null);
 
     // Close cart dropdown on outside click
     useEffect(() => {
@@ -43,6 +46,25 @@ export default function Welcome({
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
+    // Banner carousel auto-slide
+    useEffect(() => {
+        if (banners.length <= 1) return;
+        bannerTimerRef.current = setInterval(() => {
+            setCurrentBanner((prev) => (prev + 1) % banners.length);
+        }, 5000);
+        return () => clearInterval(bannerTimerRef.current);
+    }, [banners.length]);
+
+    const goToBanner = (index) => {
+        setCurrentBanner(index);
+        clearInterval(bannerTimerRef.current);
+        if (banners.length > 1) {
+            bannerTimerRef.current = setInterval(() => {
+                setCurrentBanner((prev) => (prev + 1) % banners.length);
+            }, 5000);
+        }
+    };
 
     const filteredProducts = useMemo(() => {
         const normalized = query.toLowerCase().trim();
@@ -322,27 +344,109 @@ export default function Welcome({
                 </header>
 
                 <main className="space-y-10 px-4 py-10 sm:px-6 lg:px-8">
-                    {/* Hero */}
-                    <section className={`grid items-center gap-6 rounded-3xl border p-8 md:grid-cols-2 ${cardClass}`}>
-                        <div>
-                            <h1 className={`text-4xl font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                Diskon Besar Hingga 70% di {appName}
-                            </h1>
-                            <p className={`mt-4 ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>
-                                Temukan produk terbaik dengan harga hemat,
-                                pengalaman modern, dan checkout cepat.
-                            </p>
-                            <a
-                                href="#produk-populer"
-                                className="mt-6 inline-block rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-500"
+                    {/* Banner Carousel / Hero */}
+                    {banners.length > 0 ? (
+                        <section className="relative overflow-hidden rounded-3xl">
+                            <div
+                                className="flex transition-transform duration-700 ease-in-out"
+                                style={{ transform: `translateX(-${currentBanner * 100}%)` }}
                             >
-                                Belanja Sekarang
-                            </a>
-                        </div>
-                        <div className="rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 p-8 text-7xl text-white text-center">
-                            📦 ⚡
-                        </div>
-                    </section>
+                                {banners.map((banner) => (
+                                    <div key={banner.id} className="w-full flex-shrink-0 relative">
+                                        {banner.link ? (
+                                            <a
+                                                href={banner.link}
+                                                target={banner.target_blank ? '_blank' : '_self'}
+                                                rel={banner.target_blank ? 'noopener noreferrer' : undefined}
+                                            >
+                                                <img
+                                                    src={`/storage/${banner.image}`}
+                                                    alt={banner.title}
+                                                    className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
+                                                />
+                                            </a>
+                                        ) : (
+                                            <img
+                                                src={`/storage/${banner.image}`}
+                                                alt={banner.title}
+                                                className="w-full h-[220px] sm:h-[320px] md:h-[400px] object-cover"
+                                            />
+                                        )}
+                                        {/* Overlay text */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end">
+                                            <div className="p-6 sm:p-8">
+                                                <h2 className="text-xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                                                    {banner.title}
+                                                </h2>
+                                                {banner.subtitle && (
+                                                    <p className="mt-1 text-sm sm:text-lg text-white/90 drop-shadow">
+                                                        {banner.subtitle}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Prev / Next */}
+                            {banners.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => goToBanner((currentBanner - 1 + banners.length) % banners.length)}
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-gray-700 shadow hover:bg-white transition"
+                                        aria-label="Previous banner"
+                                    >
+                                        ‹
+                                    </button>
+                                    <button
+                                        onClick={() => goToBanner((currentBanner + 1) % banners.length)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 text-gray-700 shadow hover:bg-white transition"
+                                        aria-label="Next banner"
+                                    >
+                                        ›
+                                    </button>
+                                </>
+                            )}
+
+                            {/* Dots */}
+                            {banners.length > 1 && (
+                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                                    {banners.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => goToBanner(i)}
+                                            className={`h-2.5 rounded-full transition-all duration-300 ${
+                                                i === currentBanner ? 'w-8 bg-white' : 'w-2.5 bg-white/50'
+                                            }`}
+                                            aria-label={`Go to banner ${i + 1}`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
+                    ) : (
+                        <section className={`grid items-center gap-6 rounded-3xl border p-8 md:grid-cols-2 ${cardClass}`}>
+                            <div>
+                                <h1 className={`text-4xl font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    Diskon Besar Hingga 70% di {appName}
+                                </h1>
+                                <p className={`mt-4 ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>
+                                    Temukan produk terbaik dengan harga hemat,
+                                    pengalaman modern, dan checkout cepat.
+                                </p>
+                                <a
+                                    href="#produk-populer"
+                                    className="mt-6 inline-block rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white hover:bg-indigo-500"
+                                >
+                                    Belanja Sekarang
+                                </a>
+                            </div>
+                            <div className="rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 p-8 text-7xl text-white text-center">
+                                📦 ⚡
+                            </div>
+                        </section>
+                    )}
 
                     {/* Kategori */}
                     <section>

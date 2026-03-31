@@ -16,6 +16,7 @@ export default function AuthenticatedLayout({ header, children }) {
         user.role === 'admin'
             ? [
                   { label: 'Overview', routeName: 'admin.dashboard' },
+                  { label: 'Banner', routeName: 'admin.banners.index' },
                   { label: 'Produk', routeName: 'admin.products.index' },
                   { label: 'Kategori', routeName: 'admin.categories.index' },
                   { label: 'Inventory', routeName: 'admin.inventory.index' },

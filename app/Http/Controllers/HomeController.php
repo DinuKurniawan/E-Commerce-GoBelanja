@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Banner;
 use App\Models\Testimonial;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -48,6 +49,10 @@ class HomeController extends Controller
                 ->get(['id', 'name', 'rating', 'comment'])
             : collect();
 
+        $banners = Schema::hasTable('banners')
+            ? Banner::active()->ordered()->get(['id', 'title', 'subtitle', 'image', 'link', 'target_blank'])
+            : collect();
+
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -55,6 +60,7 @@ class HomeController extends Controller
             'categories' => $categories,
             'products' => $products,
             'testimonials' => $testimonials,
+            'banners' => $banners,
         ]);
     }
 }

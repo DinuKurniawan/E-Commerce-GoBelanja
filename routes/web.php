@@ -46,6 +46,7 @@ use App\Http\Controllers\User\TwoFactorController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\IpBlockingController;
 use App\Http\Controllers\Admin\SecurityDashboardController;
+use App\Http\Controllers\Admin\BannerManagementController;
 use App\Http\Controllers\User\LoyaltyController;
 use App\Http\Controllers\User\DeliveryScheduleController;
 use App\Http\Controllers\LocaleController;
@@ -134,6 +135,14 @@ Route::middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.')
     ->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Banner Management
+        Route::get('/banners', [BannerManagementController::class, 'index'])->name('banners.index');
+        Route::post('/banners', [BannerManagementController::class, 'store'])->name('banners.store');
+        Route::post('/banners/{banner}', [BannerManagementController::class, 'update'])->name('banners.update');
+        Route::delete('/banners/{banner}', [BannerManagementController::class, 'destroy'])->name('banners.destroy');
+        Route::patch('/banners/{banner}/toggle', [BannerManagementController::class, 'toggle'])->name('banners.toggle');
+        Route::post('/banners/reorder', [BannerManagementController::class, 'reorder'])->name('banners.reorder');
 
         Route::get('/products', [ProductManagementController::class, 'index'])->name('products.index');
         Route::post('/products', [ProductManagementController::class, 'store'])->name('products.store');
