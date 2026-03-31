@@ -701,6 +701,7 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
     const [lightbox, setLightbox] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [selectedSize, setSelectedSize] = useState('');
+    const [imageFailed, setImageFailed] = useState(false);
 
     const openLightbox = () => { if (images.length > 0) { setZoom(1); setLightbox(true); } };
     const closeLightbox = () => setLightbox(false);
@@ -777,16 +778,16 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                         </span>
                     )}
 
-                    {images.length > 0 ? (
+                    {images.length > 0 && !imageFailed ? (
                         <img
                             src={images[current]}
                             alt={product.name}
-                            className="h-full w-full object-cover object-center cursor-zoom-in"
+                            className="h-full w-full bg-white p-3 object-contain object-center cursor-zoom-in"
                             onClick={openLightbox}
-                            onError={(e) => { e.target.style.display = 'none'; }}
+                            onError={() => setImageFailed(true)}
                         />
                     ) : (
-                        <div className="flex h-full w-full items-center justify-center text-4xl sm:text-5xl">
+                        <div className="flex h-full w-full items-center justify-center bg-white text-4xl sm:text-5xl">
                             {product.emoji ?? '📦'}
                         </div>
                     )}
