@@ -391,10 +391,10 @@ export default function Welcome({
                     </div>
                 </header>
 
-                <main className="space-y-10 px-4 py-10 sm:px-6 lg:px-8">
+                <main className="space-y-10 py-10">
                     {/* Banner Carousel / Hero */}
                     {banners.length > 0 ? (
-                        <section className="relative overflow-hidden rounded-3xl">
+                        <section className="relative overflow-hidden lg:mx-[-2rem]">
                             <div
                                 className="flex transition-transform duration-700 ease-in-out"
                                 style={{ transform: `translateX(-${currentBanner * 100}%)` }}
@@ -478,7 +478,7 @@ export default function Welcome({
                             )}
                         </section>
                     ) : (
-                        <section className={`grid items-center gap-6 rounded-3xl border p-8 md:grid-cols-2 ${cardClass}`}>
+                        <section className={`mx-4 grid items-center gap-6 rounded-3xl border p-8 sm:mx-6 lg:mx-8 md:grid-cols-2 ${cardClass}`}>
                             <div>
                                 <h1 className={`text-4xl font-extrabold leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                                     Diskon Besar Hingga 70% di {appName}
@@ -500,7 +500,8 @@ export default function Welcome({
                         </section>
                     )}
 
-                    <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <section className="px-4 sm:px-6 lg:px-8">
+                        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         {highlights.map((item, index) => (
                             <div
                                 key={item.label}
@@ -526,10 +527,11 @@ export default function Welcome({
                                 </p>
                             </div>
                         ))}
+                        </div>
                     </section>
 
                     {/* Kategori */}
-                    <section>
+                    <section className="px-4 sm:px-6 lg:px-8">
                         <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                             Kategori Produk
                         </h2>
@@ -558,7 +560,7 @@ export default function Welcome({
 
                     {/* Filter aktif: tampilkan semua produk yang match */}
                     {(query.trim() || activeCategory) && (
-                        <section>
+                        <section className="px-4 sm:px-6 lg:px-8">
                             <div className="flex items-center justify-between">
                                 <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                                     {activeCategory ? `Kategori: ${activeCategory}` : `Hasil: "${query}"`}
@@ -596,7 +598,7 @@ export default function Welcome({
 
                     {/* Produk Populer */}
                     {!query.trim() && !activeCategory && (
-                    <section id="produk-populer">
+                    <section id="produk-populer" className="px-4 sm:px-6 lg:px-8">
                         <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                             Produk Populer
                         </h2>
@@ -624,7 +626,7 @@ export default function Welcome({
                     )}
 
                     {/* Flash Sale Banner */}
-                    <section className="rounded-3xl bg-gradient-to-r from-rose-500 to-orange-500 p-8 text-white">
+                    <section className="mx-4 rounded-3xl bg-gradient-to-r from-rose-500 to-orange-500 p-8 text-white sm:mx-6 lg:mx-8">
                         <h2 className="text-2xl font-bold">🔥 Promo Spesial Minggu Ini</h2>
                         <p className="mt-2 opacity-90">Flash Sale &mdash; Harga terbaik setiap hari di GoBelanja!</p>
                         <div className="mt-4 flex flex-wrap gap-3">
@@ -647,7 +649,7 @@ export default function Welcome({
 
                     {/* Produk Terbaru */}
                     {!query.trim() && !activeCategory && (
-                    <section>
+                    <section className="px-4 sm:px-6 lg:px-8">
                         <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                             Produk Terbaru
                         </h2>
@@ -677,7 +679,7 @@ export default function Welcome({
 
                     {/* Testimonials */}
                     {testimonials.length > 0 && (
-                        <section>
+                        <section className="px-4 sm:px-6 lg:px-8">
                             <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                                 Apa Kata Pelanggan
                             </h2>
@@ -701,7 +703,7 @@ export default function Welcome({
                     )}
 
                     {/* Why Choose Us */}
-                    <section className={`rounded-3xl border p-8 ${cardClass}`}>
+                    <section className={`mx-4 rounded-3xl border p-8 sm:mx-6 lg:mx-8 ${cardClass}`}>
                         <h2 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                             Kenapa GoBelanja?
                         </h2>
@@ -723,7 +725,7 @@ export default function Welcome({
                     </section>
 
                     {/* Newsletter */}
-                    <section className={`overflow-hidden rounded-3xl border ${cardClass}`}>
+                    <section className={`mx-4 overflow-hidden rounded-3xl border sm:mx-6 lg:mx-8 ${cardClass}`}>
                         <div className={`grid gap-0 lg:grid-cols-[1.2fr_0.8fr]`}>
                             <div className="bg-gradient-to-br from-indigo-600 via-violet-600 to-cyan-500 p-8 text-white sm:p-10">
                                 <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/75">
