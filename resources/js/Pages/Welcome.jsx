@@ -400,7 +400,7 @@ export default function Welcome({
                                 style={{ transform: `translateX(-${currentBanner * 100}%)` }}
                             >
                                 {banners.map((banner) => (
-                                    <div key={banner.id} className="w-full flex-shrink-0 relative">
+                                    <div key={banner.id} className="w-full h-full flex-shrink-0 relative">
                                         {banner.link ? (
                                             <a
                                                 href={banner.link}
@@ -412,7 +412,7 @@ export default function Welcome({
                                                         ? banner.image
                                                         : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                     alt={banner.title}
-                                                    className="w-full h-[220px] object-cover object-center sm:h-[320px] md:h-[400px]"
+                                                    className="w-full h-[280px] object-cover object-center sm:h-[390px] md:h-[590px]"
                                                 />
                                             </a>
                                         ) : (
@@ -421,7 +421,7 @@ export default function Welcome({
                                                     ? banner.image
                                                     : `/${banner.image.startsWith('images/') ? banner.image : `storage/${banner.image}`}`}
                                                 alt={banner.title}
-                                                className="w-full h-[220px] object-cover object-center sm:h-[320px] md:h-[400px]"
+                                                className="w-full h-[280px] object-cover object-center sm:h-[390px] md:h-[590px]"
                                             />
                                         )}
                                         {/* Overlay text */}
