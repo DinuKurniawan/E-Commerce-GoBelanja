@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
             $table->text('comment');
+            $table->boolean('verified_purchase')->default(false);
+            $table->integer('helpful_count')->default(0);
+            $table->integer('not_helpful_count')->default(0);
             $table->boolean('is_spam')->default(false);
             $table->text('admin_reply')->nullable();
             $table->timestamps();

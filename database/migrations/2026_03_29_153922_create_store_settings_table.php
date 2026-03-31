@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('api_key')->nullable();
             $table->string('origin_city_id')->nullable();
             $table->string('origin_city_name')->nullable();
+            $table->string('whatsapp_number')->nullable();
             $table->timestamps();
         });
     }

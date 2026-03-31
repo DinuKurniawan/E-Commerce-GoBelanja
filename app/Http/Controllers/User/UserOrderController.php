@@ -16,7 +16,7 @@ class UserOrderController extends Controller
     {
         $orders = Order::query()
             ->where('user_id', auth()->id())
-            ->with(['items.product:id,name,slug,image_url,emoji', 'payment'])
+            ->with(['items.product:id,name,slug,image_url,emoji', 'payment', 'deliverySchedule'])
             ->latest()
             ->get();
 
@@ -35,7 +35,7 @@ class UserOrderController extends Controller
     {
         abort_unless($order->user_id === auth()->id(), 403);
 
-        $order->load(['items.product:id,name,slug,image_url,emoji', 'payment']);
+        $order->load(['items.product:id,name,slug,image_url,emoji', 'payment', 'deliverySchedule']);
 
         // Load user's existing reviews for products in this order
         $productIds = $order->items->pluck('product_id');

@@ -1,5 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import AddToCompareButton from '@/Components/AddToCompareButton';
+import ComparisonBar from '@/Components/ComparisonBar';
 
 const features = [
     'Gratis ongkir minimum pembelian tertentu',
@@ -148,16 +150,31 @@ export default function Welcome({
                         </div>
 
                         <div className="hidden flex-1 px-6 md:block">
-                            <input
-                                value={query}
-                                onChange={(e) => { setQuery(e.target.value); setActiveCategory(''); }}
-                                placeholder="Cari produk favoritmu..."
-                                className={`w-full rounded-xl border px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
-                                    darkMode
-                                        ? 'border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-400'
-                                        : 'border-slate-300 bg-white text-slate-900 placeholder:text-slate-500'
-                                }`}
-                            />
+                            <div className="relative">
+                                <input
+                                    value={query}
+                                    onChange={(e) => { setQuery(e.target.value); setActiveCategory(''); }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && query.trim()) {
+                                            router.visit(route('products.search', { q: query }));
+                                        }
+                                    }}
+                                    placeholder="Cari produk favoritmu... (Enter untuk pencarian lanjutan)"
+                                    className={`w-full rounded-xl border px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                                        darkMode
+                                            ? 'border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-400'
+                                            : 'border-slate-300 bg-white text-slate-900 placeholder:text-slate-500'
+                                    }`}
+                                />
+                                {query.trim() && (
+                                    <button
+                                        onClick={() => router.visit(route('products.search', { q: query }))}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700"
+                                    >
+                                        🔍 Cari
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -172,6 +189,14 @@ export default function Welcome({
                             >
                                 {darkMode ? '☀️ Light' : '🌙 Dark'}
                             </button>
+
+                            {/* Flash Sale Link */}
+                            <Link
+                                href={route('flash-sales.index')}
+                                className="rounded-xl bg-gradient-to-r from-red-600 to-orange-600 px-4 py-2 text-sm font-semibold text-white hover:from-red-700 hover:to-orange-700 shadow-lg"
+                            >
+                                ⚡ Flash Sale
+                            </Link>
 
                             {/* Wishlist counter */}
                             {isUser && (
@@ -418,14 +443,22 @@ export default function Welcome({
                     <section className="rounded-3xl bg-gradient-to-r from-rose-500 to-orange-500 p-8 text-white">
                         <h2 className="text-2xl font-bold">🔥 Promo Spesial Minggu Ini</h2>
                         <p className="mt-2 opacity-90">Flash Sale &mdash; Harga terbaik setiap hari di GoBelanja!</p>
-                        {!auth?.user && (
+                        <div className="mt-4 flex flex-wrap gap-3">
                             <Link
-                                href={route('register')}
-                                className="mt-4 inline-block rounded-xl bg-white px-5 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
+                                href={route('products.search', { flash_sale: true })}
+                                className="inline-block rounded-xl bg-white px-5 py-2 text-sm font-semibold text-rose-600 hover:bg-rose-50"
                             >
-                                Daftar Gratis & Belanja
+                                🔍 Lihat Semua Flash Sale
                             </Link>
-                        )}
+                            {!auth?.user && (
+                                <Link
+                                    href={route('register')}
+                                    className="inline-block rounded-xl border-2 border-white px-5 py-2 text-sm font-semibold text-white hover:bg-white hover:text-rose-600"
+                                >
+                                    Daftar Gratis & Belanja
+                                </Link>
+                            )}
+                        </div>
                     </section>
 
                     {/* Produk Terbaru */}
@@ -544,6 +577,9 @@ export default function Welcome({
                     <p className="mt-1">Tentang Kami • Kontak • Privacy Policy • Terms</p>
                 </footer>
             </div>
+
+            {/* Comparison Floating Bar */}
+            {isUser && <ComparisonBar />}
         </>
     );
 }
@@ -706,52 +742,58 @@ function ProductCard({ product, darkMode, cardClass, isWished, loadingCart, load
                 )}
 
                 {showActions ? (
-                    <div className="mt-auto pt-3 flex gap-2">
-                        <button
-                            type="button"
-                            onClick={() => onAddToCart(selectedSize)}
-                            disabled={loadingCart || product.stock === 0 || (product.sizes?.length > 0 && !selectedSize)}
-                            className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-                            title={product.sizes?.length > 0 && !selectedSize ? 'Pilih ukuran dahulu' : ''}
-                        >
-                            {loadingCart ? '...' : product.stock === 0 ? 'Habis' : product.sizes?.length > 0 && !selectedSize ? 'Pilih Ukuran' : '+ Keranjang'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onToggleWishlist}
-                            disabled={loadingWishlist}
-                            className={`rounded-lg border px-3 py-2 text-sm transition ${
-                                isWished
-                                    ? 'border-rose-400 bg-rose-50 text-rose-600'
-                                    : darkMode
-                                        ? 'border-slate-600 text-slate-100 hover:border-rose-400'
-                                        : 'border-slate-300 text-slate-700 hover:border-rose-400'
-                            }`}
-                        >
-                            {isWished ? '❤️' : '🤍'}
-                        </button>
+                    <div className="mt-auto pt-3 space-y-2">
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => onAddToCart(selectedSize)}
+                                disabled={loadingCart || product.stock === 0 || (product.sizes?.length > 0 && !selectedSize)}
+                                className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+                                title={product.sizes?.length > 0 && !selectedSize ? 'Pilih ukuran dahulu' : ''}
+                            >
+                                {loadingCart ? '...' : product.stock === 0 ? 'Habis' : product.sizes?.length > 0 && !selectedSize ? 'Pilih Ukuran' : '+ Keranjang'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onToggleWishlist}
+                                disabled={loadingWishlist}
+                                className={`rounded-lg border px-3 py-2 text-sm transition ${
+                                    isWished
+                                        ? 'border-rose-400 bg-rose-50 text-rose-600'
+                                        : darkMode
+                                            ? 'border-slate-600 text-slate-100 hover:border-rose-400'
+                                            : 'border-slate-300 text-slate-700 hover:border-rose-400'
+                                }`}
+                            >
+                                {isWished ? '❤️' : '🤍'}
+                            </button>
+                        </div>
+                        <AddToCompareButton product={product} className="w-full px-3 py-2" />
                     </div>
                 ) : (
-                    <div className="mt-auto pt-3 flex gap-2">
-                        <button
-                            type="button"
-                            onClick={() => onAddToCart(selectedSize)}
-                            disabled={product.sizes?.length > 0 && !selectedSize}
-                            className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-                        >
-                            {product.sizes?.length > 0 && !selectedSize ? 'Pilih Ukuran' : '+ Keranjang'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onToggleWishlist}
-                            className={`rounded-lg border px-3 py-2 text-sm ${
-                                darkMode
-                                    ? 'border-slate-600 text-slate-100'
-                                    : 'border-slate-300 text-slate-700'
-                            }`}
-                        >
-                            🤍
-                        </button>
+                    <div className="mt-auto pt-3 space-y-2">
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => onAddToCart(selectedSize)}
+                                disabled={product.sizes?.length > 0 && !selectedSize}
+                                className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
+                            >
+                                {product.sizes?.length > 0 && !selectedSize ? 'Pilih Ukuran' : '+ Keranjang'}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onToggleWishlist}
+                                className={`rounded-lg border px-3 py-2 text-sm ${
+                                    darkMode
+                                        ? 'border-slate-600 text-slate-100'
+                                        : 'border-slate-300 text-slate-700'
+                                }`}
+                            >
+                                🤍
+                            </button>
+                        </div>
+                        <AddToCompareButton product={product} className="w-full px-3 py-2" />
                     </div>
                 )}
             </div>

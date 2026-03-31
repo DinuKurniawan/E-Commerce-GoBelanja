@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('color_id')->nullable();
             $table->string('size', 20)->default('');
             $table->unsignedInteger('quantity')->default(1);
             $table->timestamps();
 
-            $table->unique(['user_id', 'product_id', 'size']);
+            $table->unique(['user_id', 'product_id', 'color_id', 'size']);
         });
     }
 

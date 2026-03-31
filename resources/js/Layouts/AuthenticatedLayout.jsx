@@ -1,4 +1,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import ComparisonBar from '@/Components/ComparisonBar';
+import ChatWidget from '@/Components/ChatWidget';
+import LanguageSwitcherDropdown from '@/Components/LanguageSwitcherDropdown';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -15,20 +18,26 @@ export default function AuthenticatedLayout({ header, children }) {
                   { label: 'Overview', routeName: 'admin.dashboard' },
                   { label: 'Produk', routeName: 'admin.products.index' },
                   { label: 'Kategori', routeName: 'admin.categories.index' },
+                  { label: 'Inventory', routeName: 'admin.inventory.index' },
                   { label: 'Order', routeName: 'admin.orders.index' },
                   { label: 'User', routeName: 'admin.users.index' },
                   { label: 'Promo', routeName: 'admin.promotions.index' },
+                  { label: 'Flash Sale', routeName: 'admin.flash-sales.index' },
                   { label: 'Shipping', routeName: 'admin.shipping.index' },
                   { label: 'Review', routeName: 'admin.reviews.index' },
+                  { label: 'Chat', routeName: 'admin.chat.index' },
                   { label: 'Reports', routeName: 'admin.reports.index' },
                   { label: 'Settings', routeName: 'admin.settings.index' },
               ]
             : [
                   { label: 'Dashboard', routeName: 'user.dashboard' },
+                  { label: 'Cari Produk', routeName: 'products.search' },
+                  { label: '⚡ Flash Sale', routeName: 'flash-sales.index' },
                   { label: 'Pesanan Saya', routeName: 'user.orders.index' },
                   { label: 'Keranjang', routeName: 'user.cart.index' },
                   { label: 'Checkout', routeName: 'user.checkout.index' },
                   { label: 'Wishlist', routeName: 'user.wishlist.index' },
+                  { label: 'Perbandingan', routeName: 'user.comparison.index' },
                   { label: 'Alamat', routeName: 'user.addresses.index' },
                   { label: 'Pembayaran', routeName: 'user.payments.index' },
                   { label: 'Review Produk', routeName: 'user.reviews.index' },
@@ -124,7 +133,10 @@ export default function AuthenticatedLayout({ header, children }) {
                         <p className="text-sm font-semibold text-slate-900 lg:hidden">{appName}</p>
                     </div>
 
-                    {user.role === 'user' && (
+                    <div className="flex items-center gap-3">
+                        <LanguageSwitcherDropdown />
+                        
+                        {user.role === 'user' && (
                         <div className="relative">
                             <button
                                 type="button"
@@ -173,7 +185,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </div>
                             )}
                         </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {header && (
@@ -186,6 +199,12 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <main className="flex-1">{children}</main>
             </div>
+
+            {/* Comparison Floating Bar - Only for users */}
+            {user.role === 'user' && <ComparisonBar />}
+            
+            {/* Chat Widget - Only for users */}
+            {user.role === 'user' && <ChatWidget />}
         </div>
     );
 }

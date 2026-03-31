@@ -1,6 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import SameDayDeliveryCard from '@/Components/Delivery/SameDayDeliveryCard';
+import DeliveryDatePicker from '@/Components/Delivery/DeliveryDatePicker';
+import TimeSlotSelector from '@/Components/Delivery/TimeSlotSelector';
+import SpecialInstructions from '@/Components/Delivery/SpecialInstructions';
+import DeliveryScheduleSummary from '@/Components/Delivery/DeliveryScheduleSummary';
+import PromotionSelector from '@/Components/PromotionSelector';
 
 const COURIERS = [
     { value: 'jne', label: 'JNE' },
@@ -10,12 +16,13 @@ const COURIERS = [
 
 const formatPrice = (v) => `Rp${Number(v).toLocaleString('id-ID')}`;
 
-export default function UserCheckout({ cartItems, addresses, subtotal, totalWeight, paymentMethods, bankAccounts }) {
+export default function UserCheckout({ cartItems, addresses, subtotal, totalWeight, paymentMethods, bankAccounts, availablePromotions }) {
     const items          = cartItems ?? [];
     const addressOptions = addresses ?? [];
     const methods        = paymentMethods?.length ? paymentMethods : ['Transfer Bank'];
     const banks          = bankAccounts ?? [];
     const { flash }      = usePage().props;
+    const promos         = availablePromotions ?? [];
 
     const form = useForm({
         address_id:    String(addressOptions.find((a) => a.is_default)?.id ?? addressOptions[0]?.id ?? ''),
@@ -23,20 +30,37 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
         service:       '',
         service_label: '',
         shipping_cost: 0,
+        promotion_code: '',
         payment_method: paymentMethods?.[0] ?? 'Transfer Bank',
         notes:         '',
+        delivery_date: '',
+        time_slot: '',
+        is_same_day: false,
+        special_instructions: '',
     });
 
     const [services, setServices]         = useState([]);
     const [loadingCost, setLoadingCost]   = useState(false);
     const [costError, setCostError]       = useState('');
     const [costChecked, setCostChecked]   = useState(false);
+    const [promotionDiscount, setPromotionDiscount] = useState(0);
+    const [freeShipping, setFreeShipping] = useState(false);
 
     const [shippingSetupError, setShippingSetupError] = useState('');
     const selectedAddress  = addressOptions.find((a) => String(a.id) === String(form.data.address_id));
     const effectiveCityId  = selectedAddress?.rajaongkir_city_id || '';
-    const grandTotal       = Number(subtotal ?? 0) + Number(form.data.shipping_cost);
-    const canCheckout      = items.length > 0 && addressOptions.length > 0 && form.data.service !== '';
+    
+    // Calculate grand total including promotion discount, shipping, and same-day fee
+    const sameDayFee = form.data.is_same_day ? 25000 : 0;
+    const effectiveShippingCost = freeShipping ? 0 : Number(form.data.shipping_cost);
+    const grandTotal = Number(subtotal ?? 0) - promotionDiscount + effectiveShippingCost + sameDayFee;
+    
+    const canCheckout = items.length > 0 && 
+                        addressOptions.length > 0 && 
+                        form.data.service !== '' &&
+                        form.data.delivery_date !== '' &&
+                        form.data.time_slot !== '';
+    
     useEffect(() => {
         setServices([]);
         setCostChecked(false);
@@ -93,6 +117,18 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
             service_label: `${svc.description} (${svc.etd} hari)`,
             shipping_cost: svc.cost,
         }));
+    };
+
+    const handlePromotionApply = (promotion, discount) => {
+        if (promotion && discount) {
+            form.setData('promotion_code', promotion.code);
+            setPromotionDiscount(discount.discount_amount || 0);
+            setFreeShipping(discount.free_shipping || false);
+        } else {
+            form.setData('promotion_code', '');
+            setPromotionDiscount(0);
+            setFreeShipping(false);
+        }
     };
 
     const submit = (e) => {
@@ -274,6 +310,57 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
                                 )}
                             </div>
 
+                            {/* Delivery Schedule Section */}
+                            <div className="rounded-xl border-2 border-indigo-200 bg-indigo-50/30 p-5 space-y-5">
+                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <span>📅</span>
+                                    <span>Delivery Schedule</span>
+                                </h3>
+
+                                {/* Same-Day Delivery Option */}
+                                <SameDayDeliveryCard
+                                    addressId={form.data.address_id}
+                                    selectedIsSameDay={form.data.is_same_day}
+                                    onSelect={() => {
+                                        const today = new Date();
+                                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                                        form.setData({
+                                            ...form.data,
+                                            is_same_day: true,
+                                            delivery_date: todayStr,
+                                            time_slot: '', // Will be selected from time slots
+                                        });
+                                    }}
+                                />
+
+                                {/* Regular Delivery Date Picker */}
+                                {!form.data.is_same_day && (
+                                    <DeliveryDatePicker
+                                        addressId={form.data.address_id}
+                                        selectedDate={form.data.delivery_date}
+                                        onChange={(date) => form.setData({ ...form.data, delivery_date: date, time_slot: '' })}
+                                    />
+                                )}
+
+                                {/* Time Slot Selector */}
+                                {form.data.delivery_date && (
+                                    <TimeSlotSelector
+                                        selectedDate={form.data.delivery_date}
+                                        selectedSlot={form.data.time_slot}
+                                        onChange={(slot) => form.setData('time_slot', slot)}
+                                        isSameDay={form.data.is_same_day}
+                                    />
+                                )}
+
+                                {/* Special Instructions */}
+                                {form.data.delivery_date && form.data.time_slot && (
+                                    <SpecialInstructions
+                                        value={form.data.special_instructions}
+                                        onChange={(value) => form.setData('special_instructions', value)}
+                                    />
+                                )}
+                            </div>
+
                             {/* Pembayaran */}
                             <div>
                                 <label className="mb-1 block text-sm font-semibold text-slate-700">Metode Pembayaran *</label>
@@ -326,6 +413,19 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
                                 />
                             </div>
 
+                            {/* Promotion Section */}
+                            <div className="rounded-xl border-2 border-amber-200 bg-amber-50/30 p-5">
+                                <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <span>🎟️</span>
+                                    <span>Kode Promosi</span>
+                                </h3>
+                                <PromotionSelector
+                                    availablePromotions={promos}
+                                    onApply={handlePromotionApply}
+                                    subtotal={subtotal}
+                                />
+                            </div>
+
                             {/* Error */}
                             {form.errors.cart && (
                                 <p className="rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-600">
@@ -342,7 +442,9 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
                                     ? 'Memproses...'
                                     : !form.data.service
                                         ? 'Pilih kurir & cek ongkir terlebih dahulu'
-                                        : 'Buat Pesanan'}
+                                        : !form.data.delivery_date || !form.data.time_slot
+                                            ? 'Pilih jadwal pengiriman'
+                                            : 'Buat Pesanan'}
                             </button>
                         </form>
 
@@ -378,12 +480,53 @@ export default function UserCheckout({ cartItems, addresses, subtotal, totalWeig
                                         {form.data.shipping_cost > 0 ? formatPrice(form.data.shipping_cost) : 'Belum dipilih'}
                                     </span>
                                 </div>
+                                {form.data.is_same_day && (
+                                    <div className="flex justify-between">
+                                        <span className="text-amber-600 flex items-center gap-1">
+                                            <span>⚡</span>
+                                            <span>Same-Day Fee</span>
+                                        </span>
+                                        <span className="font-semibold text-amber-600">{formatPrice(sameDayFee)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-xs text-slate-400">
                                     <span>Total Berat</span>
                                     <span>{((totalWeight ?? 1000) / 1000).toFixed(1)} kg</span>
                                 </div>
                             </div>
                             <hr className="border-slate-200" />
+                            
+                            {/* Delivery Schedule Summary */}
+                            {form.data.delivery_date && form.data.time_slot && (
+                                <>
+                                    <DeliveryScheduleSummary
+                                        deliveryDate={form.data.delivery_date}
+                                        timeSlot={form.data.time_slot}
+                                        isSameDay={form.data.is_same_day}
+                                        sameDayFee={sameDayFee}
+                                        specialInstructions={form.data.special_instructions}
+                                    />
+                                    <hr className="border-slate-200" />
+                                </>
+                            )}
+                            
+                            {/* Discount */}
+                            {promotionDiscount > 0 && (
+                                <div className="flex justify-between text-emerald-600">
+                                    <span className="font-medium">Diskon Promosi</span>
+                                    <span className="font-semibold">-{formatPrice(promotionDiscount)}</span>
+                                </div>
+                            )}
+                            
+                            {/* Free Shipping Badge */}
+                            {freeShipping && (
+                                <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-2 text-center">
+                                    <span className="text-sm font-semibold text-emerald-700">
+                                        🚚 Gratis Ongkir Diterapkan!
+                                    </span>
+                                </div>
+                            )}
+                            
                             <div className="flex justify-between">
                                 <span className="font-semibold text-slate-900">Total</span>
                                 <span className="text-lg font-bold text-indigo-600">

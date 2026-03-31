@@ -228,6 +228,7 @@ export default function UserOrderShow({ order, userReviews }) {
     const items    = order?.items ?? [];
     const payment  = order?.payment;
     const reviews  = userReviews ?? {};
+    const deliverySchedule = order?.delivery_schedule;
     const isSelesai = order?.status === 'selesai';
     const isCOD    = payment?.method?.toLowerCase().includes('cod');
 
@@ -238,6 +239,24 @@ export default function UserOrderShow({ order, userReviews }) {
 
     const subtotal = items.reduce((sum, i) => sum + Number(i.subtotal), 0);
     const shipping = Number(order.total_amount) - subtotal;
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr + 'T00:00:00');
+        return date.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    };
+
+    const TIME_SLOTS = {
+        '09:00-12:00': { label: 'Morning', time: '09:00 - 12:00', icon: '🌅' },
+        '12:00-15:00': { label: 'Afternoon', time: '12:00 - 15:00', icon: '☀️' },
+        '15:00-18:00': { label: 'Evening', time: '15:00 - 18:00', icon: '🌤️' },
+        '18:00-21:00': { label: 'Night', time: '18:00 - 21:00', icon: '🌙' },
+    };
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-slate-800">Detail Pesanan</h2>}>
@@ -322,6 +341,74 @@ export default function UserOrderShow({ order, userReviews }) {
                             </div>
                         )}
                     </div>
+
+                    {/* Delivery Schedule */}
+                    {deliverySchedule && (
+                        <div className="rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-5 shadow-sm space-y-3">
+                            <h3 className="font-semibold text-indigo-900 flex items-center gap-2">
+                                <span>🚚</span>
+                                <span>Scheduled Delivery</span>
+                            </h3>
+                            
+                            {deliverySchedule.is_same_day && (
+                                <div className="rounded-lg bg-amber-100 border border-amber-300 px-3 py-2 flex items-center gap-2">
+                                    <span className="text-lg">⚡</span>
+                                    <div>
+                                        <p className="text-sm font-bold text-amber-900">Same-Day Delivery</p>
+                                        <p className="text-xs text-amber-700">Express delivery service</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="rounded-lg bg-white border border-indigo-200 p-4">
+                                <div className="flex items-start gap-3">
+                                    <span className="text-3xl">{TIME_SLOTS[deliverySchedule.time_slot]?.icon || '📅'}</span>
+                                    <div className="flex-1">
+                                        <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Delivery Date & Time</p>
+                                        <p className="font-bold text-slate-800">
+                                            {formatDate(deliverySchedule.delivery_date)}
+                                        </p>
+                                        <p className="text-sm text-indigo-600 font-medium mt-1">
+                                            {TIME_SLOTS[deliverySchedule.time_slot]?.label} ({TIME_SLOTS[deliverySchedule.time_slot]?.time})
+                                        </p>
+                                        
+                                        {deliverySchedule.status && (
+                                            <div className="mt-2">
+                                                <span className={`inline-block rounded-full px-2.5 py-1 text-xs font-semibold ${
+                                                    deliverySchedule.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
+                                                    deliverySchedule.status === 'in_transit' ? 'bg-blue-100 text-blue-700' :
+                                                    'bg-amber-100 text-amber-700'
+                                                }`}>
+                                                    {deliverySchedule.status === 'scheduled' ? '📅 Scheduled' :
+                                                     deliverySchedule.status === 'in_transit' ? '🚚 In Transit' :
+                                                     deliverySchedule.status === 'delivered' ? '✅ Delivered' :
+                                                     deliverySchedule.status}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {deliverySchedule.special_instructions && (
+                                    <div className="mt-3 pt-3 border-t border-indigo-100">
+                                        <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">
+                                            Special Instructions
+                                        </p>
+                                        <p className="text-sm text-slate-700">
+                                            {deliverySchedule.special_instructions}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="rounded-lg bg-white border border-indigo-200 px-3 py-2 text-xs text-slate-600">
+                                <p className="flex items-center gap-1">
+                                    <span>ℹ️</span>
+                                    <span>We'll deliver your order during the selected time slot</span>
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Pengiriman */}
                     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-1">

@@ -55,6 +55,9 @@ createInertiaApp({
             inertiaRoot = createRoot(el);
         }
 
+        // Make auth available globally for localStorage sync
+        window.auth = props.initialPage.props.auth;
+
         inertiaRoot.render(
             <AppErrorBoundary>
                 <App {...props} />

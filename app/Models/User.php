@@ -7,12 +7,14 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'role', 'is_active', 'profile_photo_path'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'role', 'is_active', 'profile_photo_path', 'birthday', 'referred_by', 'two_factor_secret', 'two_factor_enabled', 'two_factor_verified_at', 'last_login_ip', 'last_login_at', 'failed_login_attempts', 'blocked_until'])]
+#[Hidden(['password', 'remember_token', 'two_factor_secret'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -29,6 +31,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'birthday' => 'date',
+            'two_factor_enabled' => 'boolean',
+            'two_factor_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'blocked_until' => 'datetime',
         ];
     }
 
@@ -65,5 +72,50 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(UserNotification::class);
+    }
+
+    public function loyaltyTier(): HasOne
+    {
+        return $this->hasOne(UserLoyaltyTier::class);
+    }
+
+    public function loyaltyPoints(): HasMany
+    {
+        return $this->hasMany(LoyaltyPoint::class);
+    }
+
+    public function referredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    public function productComparisons(): HasMany
+    {
+        return $this->hasMany(ProductComparison::class);
+    }
+
+    public function chatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
+
+    public function preOrders(): HasMany
+    {
+        return $this->hasMany(PreOrder::class);
+    }
+
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
+    }
+
+    public function reviewVotes(): HasMany
+    {
+        return $this->hasMany(ReviewVote::class);
     }
 }

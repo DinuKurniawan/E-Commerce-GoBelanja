@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import useConfirm from '@/Hooks/useConfirm';
+import BulkActionsToolbar from '@/Components/BulkActionsToolbar';
 
 const emptyProduct = {
     category_id: '',
@@ -44,6 +45,9 @@ export default function Products({ products, categories }) {
     const [editingImages, setEditingImages] = useState([]);
     const [addSizes, setAddSizes] = useState([]);
     const [editSizes, setEditSizes] = useState([]);
+    
+    // Bulk selection state
+    const [selectedIds, setSelectedIds] = useState([]);
 
     const addForm = useForm({ ...emptyProduct, category_id: String(categoryList[0]?.id ?? '') });
     const editForm = useForm({ ...emptyProduct, category_id: String(categoryList[0]?.id ?? '') });
@@ -140,6 +144,25 @@ export default function Products({ products, categories }) {
         });
     };
 
+    // Bulk selection handlers
+    const toggleSelectAll = () => {
+        if (selectedIds.length === productList.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(productList.map(p => p.id));
+        }
+    };
+
+    const toggleSelectProduct = (id) => {
+        setSelectedIds(prev => 
+            prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
+        );
+    };
+
+    const clearSelection = () => {
+        setSelectedIds([]);
+    };
+
     return (
         <AuthenticatedLayout
             header={<h2 className="text-xl font-semibold text-slate-800">Manajemen Produk</h2>}
@@ -155,6 +178,29 @@ export default function Products({ products, categories }) {
                             {flash.success}
                         </div>
                     )}
+
+                    {/* Bulk Operations Link */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-semibold text-blue-900">Import/Export Products</h3>
+                                <p className="text-xs text-blue-700 mt-1">Import products from CSV or export data for analysis</p>
+                            </div>
+                            <a
+                                href={route('admin.bulk-operations.index')}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                            >
+                                🔄 Bulk Operations
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Bulk Actions Toolbar */}
+                    <BulkActionsToolbar
+                        selectedIds={selectedIds}
+                        categories={categoryList}
+                        onClearSelection={clearSelection}
+                    />
 
                     {/* ── Add Form ── */}
                     <ProductForm
@@ -195,6 +241,14 @@ export default function Products({ products, categories }) {
                         <table className="min-w-full text-sm">
                             <thead className="bg-slate-50">
                                 <tr>
+                                    <th className="px-4 py-3 w-12">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.length === productList.length && productList.length > 0}
+                                            onChange={toggleSelectAll}
+                                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                    </th>
                                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Produk</th>
                                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Kategori</th>
                                     <th className="px-4 py-3 text-left font-semibold text-slate-700">Harga</th>
@@ -209,6 +263,14 @@ export default function Products({ products, categories }) {
                                         key={product.id}
                                         className={`border-t border-slate-100 transition ${editingId === product.id ? 'bg-amber-50' : 'hover:bg-slate-50'}`}
                                     >
+                                        <td className="px-4 py-3">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.includes(product.id)}
+                                                onChange={() => toggleSelectProduct(product.id)}
+                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            />
+                                        </td>
                                         <td className="px-4 py-3 font-medium text-slate-900">
                                             {product.name}
                                         </td>
@@ -246,7 +308,7 @@ export default function Products({ products, categories }) {
                                 ))}
                                 {productList.length === 0 && (
                                     <tr>
-                                        <td className="px-4 py-10 text-center text-slate-500" colSpan={6}>
+                                        <td className="px-4 py-10 text-center text-slate-500" colSpan={7}>
                                             Belum ada produk. Tambahkan produk pertama di atas.
                                         </td>
                                     </tr>

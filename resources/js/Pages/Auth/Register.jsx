@@ -3,6 +3,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
+import PasswordStrengthIndicator from '@/Components/Security/PasswordStrengthIndicator';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
@@ -80,6 +81,7 @@ export default function Register() {
                     />
 
                     <InputError message={errors.password} className="mt-2" />
+                    <PasswordStrengthIndicator password={data.password} />
                 </div>
 
                 <div className="mt-4">

@@ -42,8 +42,32 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        if ($user && $user->blocked_until && $user->blocked_until->isFuture()) {
+            $minutesRemaining = now()->diffInMinutes($user->blocked_until);
+            
+            throw ValidationException::withMessages([
+                'email' => "Too many failed login attempts. Account is locked. Try again in {$minutesRemaining} minutes.",
+            ]);
+        }
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+
+            if ($user) {
+                $user->increment('failed_login_attempts');
+
+                if ($user->failed_login_attempts >= 5) {
+                    $user->update([
+                        'blocked_until' => now()->addMinutes(15),
+                    ]);
+
+                    throw ValidationException::withMessages([
+                        'email' => 'Too many failed login attempts. Account locked for 15 minutes.',
+                    ]);
+                }
+            }
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\CartItem;
+use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,6 +40,9 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
             ],
             'appName' => config('app.name'),
+            'storeSettings' => function () {
+                return StoreSetting::first();
+            },
             'cartPreview' => $isUserRole ? function () use ($user) {
                 $items = CartItem::query()
                     ->where('user_id', $user->id)
@@ -52,6 +56,20 @@ class HandleInertiaRequests extends Middleware
                     'total' => (int) $items->sum(fn ($item) => ($item->product?->price ?? 0) * $item->quantity),
                     'items' => $items,
                 ];
+            } : null,
+            'locale' => app()->getLocale(),
+            'locales' => config('app.available_locales'),
+            'localeNames' => config('app.locale_names'),
+            'translations' => [
+                'general' => __('general'),
+                'auth' => __('auth'),
+                'products' => __('products'),
+                'cart' => __('cart'),
+                'orders' => __('orders'),
+                'admin' => __('admin'),
+            ],
+            'loyaltyTier' => $isUserRole ? function () use ($user) {
+                return $user->loyaltyTier()->first(['tier', 'total_points', 'lifetime_points']);
             } : null,
         ];
     }

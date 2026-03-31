@@ -119,6 +119,122 @@ class RajaOngkirService
         return $services;
     }
 
+    /**
+     * Compare shipping costs across multiple couriers.
+     *
+     * @param  string  $destination  Destination city_id
+     * @param  int     $weightGrams  Total weight in grams
+     * @param  array   $couriers     Array of courier codes (default: all major couriers)
+     * @return array   Combined list of all courier services with costs
+     */
+    public function compareAllCouriers(string $destination, int $weightGrams, array $couriers = []): array
+    {
+        if (empty($couriers)) {
+            $couriers = ['jne', 'tiki', 'pos', 'sicepat', 'jnt'];
+        }
+
+        $allServices = [];
+        foreach ($couriers as $courier) {
+            $services = $this->getCost($destination, $weightGrams, $courier);
+            $allServices = array_merge($allServices, $services);
+        }
+
+        return $allServices;
+    }
+
+    /**
+     * Track shipment (mock data since RajaOngkir doesn't have tracking API).
+     *
+     * @param  string  $courier         Courier code (jne, tiki, etc.)
+     * @param  string  $trackingNumber  Tracking/AWB number
+     * @return array   Mock tracking data
+     */
+    public function trackShipment(string $courier, string $trackingNumber): array
+    {
+        // Since RajaOngkir doesn't provide tracking API, return mock data
+        // In production, you could integrate with courier-specific APIs
+        
+        $courierNames = [
+            'jne' => 'JNE',
+            'tiki' => 'TIKI',
+            'pos' => 'POS Indonesia',
+            'sicepat' => 'SiCepat',
+            'jnt' => 'J&T Express',
+        ];
+
+        $courierName = $courierNames[strtolower($courier)] ?? strtoupper($courier);
+
+        return [
+            'courier' => $courierName,
+            'tracking_number' => $trackingNumber,
+            'status' => 'in_transit',
+            'status_label' => 'Dalam Perjalanan',
+            'estimated_delivery' => now()->addDays(2)->format('Y-m-d'),
+            'tracking_url' => $this->getTrackingUrl($courier, $trackingNumber),
+            'history' => $this->getMockTrackingHistory(),
+        ];
+    }
+
+    /**
+     * Get tracking URL for a courier.
+     */
+    private function getTrackingUrl(string $courier, string $trackingNumber): ?string
+    {
+        $urls = [
+            'jne' => "https://www.jne.co.id/id/tracking/trace/{$trackingNumber}",
+            'tiki' => "https://www.tiki.id/id/tracking?kode={$trackingNumber}",
+            'pos' => "https://www.posindonesia.co.id/id/tracking?barcode={$trackingNumber}",
+            'sicepat' => "https://www.sicepat.com/checkAwb/{$trackingNumber}",
+            'jnt' => "https://www.jet.co.id/track?awb={$trackingNumber}",
+        ];
+
+        return $urls[strtolower($courier)] ?? null;
+    }
+
+    /**
+     * Generate mock tracking history.
+     */
+    private function getMockTrackingHistory(): array
+    {
+        return [
+            [
+                'status' => 'delivered',
+                'status_label' => 'Telah Diterima',
+                'description' => 'Paket telah diterima oleh penerima',
+                'location' => 'Jakarta Selatan',
+                'timestamp' => now()->subDays(0)->format('Y-m-d H:i:s'),
+            ],
+            [
+                'status' => 'out_for_delivery',
+                'status_label' => 'Dalam Pengiriman',
+                'description' => 'Paket sedang dalam proses pengiriman ke alamat tujuan',
+                'location' => 'Jakarta Selatan Hub',
+                'timestamp' => now()->subDays(0)->subHours(3)->format('Y-m-d H:i:s'),
+            ],
+            [
+                'status' => 'in_transit',
+                'status_label' => 'Dalam Perjalanan',
+                'description' => 'Paket dalam perjalanan menuju kota tujuan',
+                'location' => 'Sorting Center Jakarta',
+                'timestamp' => now()->subDays(1)->format('Y-m-d H:i:s'),
+            ],
+            [
+                'status' => 'picked_up',
+                'status_label' => 'Paket Diambil',
+                'description' => 'Paket telah diambil oleh kurir',
+                'location' => 'Bandung',
+                'timestamp' => now()->subDays(2)->format('Y-m-d H:i:s'),
+            ],
+            [
+                'status' => 'processing',
+                'status_label' => 'Diproses',
+                'description' => 'Paket sedang diproses di warehouse',
+                'location' => 'Bandung Hub',
+                'timestamp' => now()->subDays(3)->format('Y-m-d H:i:s'),
+            ],
+        ];
+    }
+
     public function searchDestinations(string $search, int $limit = 20): array
     {
         $this->lastError = null;

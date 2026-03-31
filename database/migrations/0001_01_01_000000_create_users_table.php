@@ -21,6 +21,16 @@ return new class extends Migration
             $table->string('role')->default('user');
             $table->boolean('is_active')->default(true);
             $table->string('profile_photo_path')->nullable();
+            $table->string('locale', 2)->default('id');
+            $table->date('birthday')->nullable();
+            $table->foreignId('referred_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('two_factor_secret')->nullable();
+            $table->boolean('two_factor_enabled')->default(false);
+            $table->timestamp('two_factor_verified_at')->nullable();
+            $table->string('last_login_ip')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->integer('failed_login_attempts')->default(0);
+            $table->timestamp('blocked_until')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

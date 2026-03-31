@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
     'api_key',
     'origin_city_id',
     'origin_city_name',
+    'whatsapp_number',
 ])]
 class StoreSetting extends Model
 {

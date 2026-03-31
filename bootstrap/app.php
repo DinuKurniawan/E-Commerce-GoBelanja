@@ -12,12 +12,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \App\Http\Middleware\IpBlockingMiddleware::class,
+            \App\Http\Middleware\ForceHttps::class,
+            \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserRole::class,
+            'loyalty' => \App\Http\Middleware\ApplyLoyaltyDiscount::class,
+            'recaptcha' => \App\Http\Middleware\RecaptchaMiddleware::class,
+            'check.blocked' => \App\Http\Middleware\CheckAccountBlocked::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

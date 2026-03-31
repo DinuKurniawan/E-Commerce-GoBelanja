@@ -9,6 +9,7 @@ export default function UserDashboard({ overview, recentOrders }) {
         { href: route('user.checkout.index'), label: 'Checkout' },
         { href: route('user.orders.index'), label: 'Pesanan Saya' },
         { href: route('user.wishlist.index'), label: 'Wishlist' },
+        { href: route('user.loyalty.index'), label: 'Loyalty Program' },
         { href: route('user.addresses.index'), label: 'Alamat' },
         { href: route('user.payments.index'), label: 'Pembayaran' },
         { href: route('user.reviews.index'), label: 'Review Produk' },
