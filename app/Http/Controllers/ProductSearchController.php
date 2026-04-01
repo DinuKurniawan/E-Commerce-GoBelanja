@@ -4,16 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\FlashSale;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ProductSearchController extends Controller
 {
     public function search(Request $request)
     {
+        $minRating = $request->filled('min_rating') ? (float) $request->min_rating : null;
+
         $query = Product::query()
-            ->with(['category', 'images', 'reviews']);
+            ->with(['category', 'images'])
+            ->withAvg('reviews as reviews_avg_rating', 'rating')
+            ->withCount('reviews');
 
         // Keyword search (name)
         if ($request->filled('q')) {
@@ -40,8 +42,12 @@ class ProductSearchController extends Controller
         }
 
         // Rating filter
-        if ($request->filled('min_rating')) {
-            $query->where('rating', '>=', $request->min_rating);
+        if ($minRating !== null) {
+            $query->whereHas('reviews', function ($q) use ($minRating) {
+                $q->selectRaw('AVG(rating)')
+                    ->groupBy('product_id')
+                    ->havingRaw('AVG(rating) >= ?', [$minRating]);
+            });
         }
 
         // Availability filter
@@ -83,7 +89,7 @@ class ProductSearchController extends Controller
                 $query->orderBy('created_at', 'desc');
                 break;
             case 'rating':
-                $query->orderBy('rating', 'desc');
+                $query->orderByDesc('reviews_avg_rating');
                 break;
             case 'popular':
                 $query->orderBy('views_count', 'desc');
@@ -94,6 +100,13 @@ class ProductSearchController extends Controller
 
         // Pagination
         $products = $query->paginate(12)->withQueryString();
+        $products->getCollection()->transform(function ($product) {
+            $product->rating = $product->reviews_avg_rating !== null
+                ? round((float) $product->reviews_avg_rating, 1)
+                : null;
+
+            return $product;
+        });
 
         // Get categories for filters
         $categories = Category::withCount('products')->get();

@@ -287,6 +287,8 @@ export default function ProductSearch({
 function ProductCard({ product, auth, wishlist, setWishlist }) {
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const isInWishlist = wishlist.includes(product.id);
+    const hasRating = typeof product.rating === 'number' && Number.isFinite(product.rating) && product.rating > 0;
+    const ratingValue = hasRating ? product.rating : 0;
 
     const handleAddToCart = () => {
         if (!auth.user) {
@@ -410,7 +412,7 @@ function ProductCard({ product, auth, wishlist, setWishlist }) {
                             <StarIcon
                                 key={i}
                                 className={`h-4 w-4 ${
-                                    i < Math.floor(product.rating)
+                                    i < Math.floor(ratingValue)
                                         ? 'text-yellow-400'
                                         : 'text-gray-300'
                                 }`}
@@ -418,7 +420,7 @@ function ProductCard({ product, auth, wishlist, setWishlist }) {
                         ))}
                     </div>
                     <span className="text-xs text-gray-600">
-                        ({product.rating.toFixed(1)})
+                        {hasRating ? `(${ratingValue.toFixed(1)})` : '(Belum ada rating)'}
                     </span>
                 </div>
 
