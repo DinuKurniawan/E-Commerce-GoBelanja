@@ -1,4 +1,4 @@
-name: Deploy Cepat via ZIP
+name: Deploy Website ke Rumahweb
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+  web-deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Get latest code
@@ -25,28 +25,23 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
-      - name: Create ZIP archive
-        run: |
-          rm -f deploy.zip
-          zip -r deploy.zip . \
-            -x ".git/*" ".github/*" "node_modules/*" "tests/*" ".env" ".env.*" "storage/logs/*"
-
-      - name: Prepare FTP upload directory
-        run: |
-          rm -rf deploy-package
-          mkdir -p deploy-package
-          mv deploy.zip deploy-package/deploy.zip
-
-      - name: Upload ZIP via FTP
+      - name: Sync files ke Server
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./deploy-package/
+          local-dir: ./
           server-dir: public_html/gobelanja.codeunchs.my.id/  # Folder tujuan di hosting
-
-      - name: Extract ZIP on server
-        run: |
-          curl --fail --silent --show-error -u "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" \
-            "${{ secrets.CPANEL_URL }}/execute/Fileman/extract?path=%2Fpublic_html%2Fgobelanja.codeunchs.my.id%2Fdeploy.zip&dest=%2Fpublic_html%2Fgobelanja.codeunchs.my.id%2F"
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/vendor/**
+            **/tests/**
+            **/.env
+            **/.env.*
+            **/storage/logs/**
+            **/storage/framework/cache/**
+            **/storage/framework/sessions/**
+            **/storage/framework/views/**
