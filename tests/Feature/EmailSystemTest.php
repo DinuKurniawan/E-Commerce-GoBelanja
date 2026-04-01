@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Mail\WelcomeEmail;
 use App\Mail\OrderConfirmationMail;
+use App\Mail\WelcomeEmail;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,10 +23,10 @@ class EmailSystemTest extends TestCase
             'email' => 'john@example.com',
         ]);
 
-        Mail::to($user->email)->send(new WelcomeEmail($user));
+        Mail::to($user->email)->queue(new WelcomeEmail($user));
 
-        Mail::assertSent(WelcomeEmail::class, function ($mail) use ($user) {
-            return $mail->user->id === $user->id;
+        Mail::assertQueued(WelcomeEmail::class, function ($mail) use ($user) {
+            return $mail->user->is($user);
         });
     }
 
@@ -35,12 +35,18 @@ class EmailSystemTest extends TestCase
         Mail::fake();
 
         $user = User::factory()->create();
-        $order = Order::factory()->create(['user_id' => $user->id]);
+        $order = Order::query()->create([
+            'user_id' => $user->id,
+            'order_number' => 'ORD-TEST-0001',
+            'total_amount' => 100000,
+            'status' => 'pending',
+            'payment_status' => 'pending',
+        ]);
 
-        Mail::to($user->email)->send(new OrderConfirmationMail($order));
+        Mail::to($user->email)->queue(new OrderConfirmationMail($order));
 
-        Mail::assertSent(OrderConfirmationMail::class, function ($mail) use ($order) {
-            return $mail->order->id === $order->id;
+        Mail::assertQueued(OrderConfirmationMail::class, function ($mail) use ($order) {
+            return $mail->order->is($order);
         });
     }
 
