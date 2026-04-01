@@ -1,5 +1,4 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import LanguageSwitcherDropdown from '@/Components/LanguageSwitcherDropdown';
 import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
@@ -26,9 +25,6 @@ export default function GuestLayout({ children }) {
 
                 <div className="flex items-center justify-center px-4 py-10 sm:px-6">
                     <div className="w-full max-w-md">
-                        <div className="mb-4 flex justify-end">
-                            <LanguageSwitcherDropdown />
-                        </div>
                         <div className="overflow-hidden rounded-3xl border border-slate-800 bg-white p-7 shadow-2xl">
                             <div className="mb-6 flex items-center gap-3 lg:hidden">
                                 <Link href="/">

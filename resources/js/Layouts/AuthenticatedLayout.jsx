@@ -1,7 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import ComparisonBar from '@/Components/ComparisonBar';
 import ChatWidget from '@/Components/ChatWidget';
-import LanguageSwitcherDropdown from '@/Components/LanguageSwitcherDropdown';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -137,8 +136,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <LanguageSwitcherDropdown />
-                        
                         {user.role === 'user' && (
                         <div className="relative">
                             <button

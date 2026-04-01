@@ -57,17 +57,6 @@ class HandleInertiaRequests extends Middleware
                     'items' => $items,
                 ];
             } : null,
-            'locale' => app()->getLocale(),
-            'locales' => config('app.available_locales'),
-            'localeNames' => config('app.locale_names'),
-            'translations' => [
-                'general' => __('general'),
-                'auth' => __('auth'),
-                'products' => __('products'),
-                'cart' => __('cart'),
-                'orders' => __('orders'),
-                'admin' => __('admin'),
-            ],
             'loyaltyTier' => $isUserRole ? function () use ($user) {
                 return $user->loyaltyTier()->first(['tier', 'total_points', 'lifetime_points']);
             } : null,

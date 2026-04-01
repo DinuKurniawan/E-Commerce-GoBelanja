@@ -1,5 +1,4 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import LanguageSwitcherDropdown from '@/Components/LanguageSwitcherDropdown';
 
 export default function PublicLayout({ title, children }) {
     const { appName, auth } = usePage().props;
@@ -40,8 +39,6 @@ export default function PublicLayout({ title, children }) {
                         </nav>
 
                         <div className="flex items-center gap-2 sm:gap-3">
-                            <LanguageSwitcherDropdown />
-
                             {user ? (
                                 <Link
                                     href={route('dashboard')}

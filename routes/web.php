@@ -51,14 +51,9 @@ use App\Http\Controllers\Admin\BannerManagementController;
 use App\Http\Controllers\User\LoyaltyController;
 use App\Http\Controllers\User\ReturnRequestController;
 use App\Http\Controllers\User\DeliveryScheduleController;
-use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\ReturnRequestManagementController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
-
-// Locale Routes (Public)
-Route::post('/locale', [LocaleController::class, 'setLocale'])->name('locale.set');
-Route::get('/locale', [LocaleController::class, 'getLocale'])->name('locale.get');
 
 // Shared hosting fallback for /storage URLs when public/storage symlink is unavailable.
 Route::get('/storage/{path}', function (string $path) {
