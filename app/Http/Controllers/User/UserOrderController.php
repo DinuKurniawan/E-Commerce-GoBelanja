@@ -33,7 +33,7 @@ class UserOrderController extends Controller
 
     public function show(Order $order): Response
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        abort_unless((int) $order->user_id === (int) auth()->id(), 403);
 
         $order->load([
             'items.product:id,name,slug,image_url,emoji',
@@ -60,7 +60,7 @@ class UserOrderController extends Controller
 
     public function uploadDeliveryProof(Order $order): RedirectResponse
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        abort_unless((int) $order->user_id === (int) auth()->id(), 403);
         abort_unless($order->status === 'selesai', 403);
 
         request()->validate([
