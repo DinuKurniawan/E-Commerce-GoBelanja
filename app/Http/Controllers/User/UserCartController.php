@@ -150,7 +150,7 @@ class UserCartController extends Controller
 
     public function update(CartItem $cart): RedirectResponse
     {
-        abort_unless($cart->user_id === auth()->id(), 403);
+        abort_unless((int) $cart->user_id === (int) auth()->id(), 403);
 
         $validated = request()->validate([
             'quantity' => 'required|integer|min:1|max:99',
@@ -189,7 +189,7 @@ class UserCartController extends Controller
 
     public function destroy(CartItem $cart): RedirectResponse
     {
-        abort_unless($cart->user_id === auth()->id(), 403);
+        abort_unless((int) $cart->user_id === (int) auth()->id(), 403);
 
         $cart->delete();
 

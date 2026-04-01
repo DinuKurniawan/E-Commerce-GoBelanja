@@ -13,7 +13,7 @@ class ReviewVoteController extends Controller
     public function vote(Request $request, Review $review): RedirectResponse
     {
         // Prevent voting on own reviews
-        if ($review->user_id === auth()->id()) {
+        if ((int) $review->user_id === (int) auth()->id()) {
             return back()->with('error', 'Anda tidak dapat memberikan vote pada review Anda sendiri.');
         }
 

@@ -92,7 +92,7 @@ class UserReviewController extends Controller
 
     public function destroy(Review $review): RedirectResponse
     {
-        abort_unless($review->user_id === auth()->id(), 403);
+        abort_unless((int) $review->user_id === (int) auth()->id(), 403);
 
         // Delete associated media files
         foreach ($review->media as $media) {

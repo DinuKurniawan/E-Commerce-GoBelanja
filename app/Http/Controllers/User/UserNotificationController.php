@@ -24,7 +24,7 @@ class UserNotificationController extends Controller
 
     public function markRead(UserNotification $notification): RedirectResponse
     {
-        abort_unless($notification->user_id === auth()->id(), 403);
+        abort_unless((int) $notification->user_id === (int) auth()->id(), 403);
 
         $notification->update(['is_read' => true]);
 

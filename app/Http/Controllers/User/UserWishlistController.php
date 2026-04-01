@@ -46,7 +46,7 @@ class UserWishlistController extends Controller
 
     public function destroy(Wishlist $wishlist): RedirectResponse
     {
-        abort_unless($wishlist->user_id === auth()->id(), 403);
+        abort_unless((int) $wishlist->user_id === (int) auth()->id(), 403);
 
         $wishlist->delete();
 
@@ -78,7 +78,7 @@ class UserWishlistController extends Controller
 
     public function moveToCart(Wishlist $wishlist): RedirectResponse
     {
-        abort_unless($wishlist->user_id === auth()->id(), 403);
+        abort_unless((int) $wishlist->user_id === (int) auth()->id(), 403);
 
         $wishlist->load('product:id,stock');
         $stock = (int) ($wishlist->product?->stock ?? 0);

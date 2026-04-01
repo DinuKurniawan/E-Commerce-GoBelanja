@@ -63,7 +63,7 @@ class UserAddressController extends Controller
 
     public function update(UserAddress $address): RedirectResponse
     {
-        abort_unless($address->user_id === auth()->id(), 403);
+        abort_unless((int) $address->user_id === (int) auth()->id(), 403);
 
         $validated = request()->validate([
             'label'              => 'required|string|max:100',
@@ -100,7 +100,7 @@ class UserAddressController extends Controller
 
     public function destroy(UserAddress $address): RedirectResponse
     {
-        abort_unless($address->user_id === auth()->id(), 403);
+        abort_unless((int) $address->user_id === (int) auth()->id(), 403);
 
         $address->delete();
 
@@ -109,7 +109,7 @@ class UserAddressController extends Controller
 
     public function setDefault(UserAddress $address): RedirectResponse
     {
-        abort_unless($address->user_id === auth()->id(), 403);
+        abort_unless((int) $address->user_id === (int) auth()->id(), 403);
 
         UserAddress::query()
             ->where('user_id', auth()->id())
