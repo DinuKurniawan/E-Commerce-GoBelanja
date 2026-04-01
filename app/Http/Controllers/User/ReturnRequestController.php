@@ -37,7 +37,7 @@ class ReturnRequestController extends Controller
 
     public function show(ReturnRequest $returnRequest): Response
     {
-        abort_unless($returnRequest->user_id === auth()->id(), 403);
+        abort_unless((int) $returnRequest->user_id === (int) auth()->id(), 403);
 
         $returnRequest->load([
             'order.items.product:id,name,image_url,emoji',
@@ -52,7 +52,7 @@ class ReturnRequestController extends Controller
 
     public function store(Request $request, Order $order): RedirectResponse
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        abort_unless((int) $order->user_id === (int) auth()->id(), 403);
         abort_unless($order->status === 'selesai', 403);
 
         $validated = $request->validate([
