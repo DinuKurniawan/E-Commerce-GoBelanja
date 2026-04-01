@@ -33,12 +33,23 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: public_html/gobelanja.codeunchs.my.id/  # Folder tujuan di hosting
+          state-name: .ftp-deploy-sync-state.json
           exclude: |
             **/.git*
             **/.github/**
             **/node_modules/**
             **/vendor/**
             **/tests/**
+            **/database/**
+            **/docs/**
+            **/*.md
+            **/package*.json
+            **/vite.config.js
+            **/tailwind.config.js
+            **/postcss.config.js
+            **/jsconfig.json
+            **/resources/js/**
+            **/resources/css/**
             **/.env
             **/.env.*
             **/storage/logs/**

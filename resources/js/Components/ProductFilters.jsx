@@ -9,10 +9,16 @@ export default function ProductFilters({
     filters = {},
     onFilterChange 
 }) {
+    const normalizeCategoryIds = (value) => {
+        if (Array.isArray(value)) return value.map((id) => Number(id));
+        if (value === null || value === undefined || value === '') return [];
+        return [Number(value)];
+    };
+
     const [localFilters, setLocalFilters] = useState({
         min_price: filters.min_price || priceRange.min,
         max_price: filters.max_price || priceRange.max,
-        categories: filters.categories || [],
+        categories: normalizeCategoryIds(filters.categories),
         min_rating: filters.min_rating || '',
         availability: filters.availability || '',
         flash_sale: filters.flash_sale || false,
@@ -25,7 +31,7 @@ export default function ProductFilters({
         setLocalFilters({
             min_price: filters.min_price || priceRange.min,
             max_price: filters.max_price || priceRange.max,
-            categories: filters.categories || [],
+            categories: normalizeCategoryIds(filters.categories),
             min_rating: filters.min_rating || '',
             availability: filters.availability || '',
             flash_sale: filters.flash_sale || false,

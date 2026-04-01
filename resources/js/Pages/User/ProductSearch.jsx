@@ -13,6 +13,7 @@ export default function ProductSearch({
     priceRange, 
     filters: initialFilters = {} 
 }) {
+    const authData = auth ?? { user: null };
     const [wishlist, setWishlist] = useState([]);
 
     const handleSearch = (query) => {
@@ -130,7 +131,7 @@ export default function ProductSearch({
 
             <div className="min-h-screen bg-slate-50 py-8">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    {!auth.user && (
+                    {!authData.user && (
                         <div className="mb-6 overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 text-white shadow-lg">
                             <div className="flex flex-col gap-6 px-6 py-8 md:flex-row md:items-center md:justify-between md:px-8">
                                 <div className="max-w-2xl">
@@ -231,7 +232,7 @@ export default function ProductSearch({
                                             <ProductCard
                                                 key={product.id}
                                                 product={product}
-                                                auth={auth}
+                                                auth={authData}
                                                 wishlist={wishlist}
                                                 setWishlist={setWishlist}
                                             />
@@ -269,7 +270,7 @@ export default function ProductSearch({
         </>
     );
 
-    return auth.user ? (
+    return authData.user ? (
         <AuthenticatedLayout
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
@@ -291,7 +292,7 @@ function ProductCard({ product, auth, wishlist, setWishlist }) {
     const ratingValue = hasRating ? product.rating : 0;
 
     const handleAddToCart = () => {
-        if (!auth.user) {
+        if (!auth?.user) {
             router.visit(route('login'));
             return;
         }
@@ -311,7 +312,7 @@ function ProductCard({ product, auth, wishlist, setWishlist }) {
     };
 
     const handleToggleWishlist = () => {
-        if (!auth.user) {
+        if (!auth?.user) {
             router.visit(route('login'));
             return;
         }
