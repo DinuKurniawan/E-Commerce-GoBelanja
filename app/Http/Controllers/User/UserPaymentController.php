@@ -40,7 +40,7 @@ class UserPaymentController extends Controller
     public function uploadProof(Payment $payment): RedirectResponse
     {
         $payment->load('order:id,user_id');
-        abort_unless($payment->order?->user_id === auth()->id(), 403);
+        abort_unless((int) ($payment->order?->user_id ?? 0) === (int) auth()->id(), 403);
 
         if ($payment->status === 'paid') {
             return back()->withErrors([
