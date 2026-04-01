@@ -29,7 +29,7 @@ export default function AuthenticatedLayout({ header, children }) {
                   { label: 'Review', routeName: 'admin.reviews.index' },
                   { label: 'Chat', routeName: 'admin.chat.index' },
                   { label: 'Reports', routeName: 'admin.reports.index' },
-                  { label: 'Settingseeeeeeeeeee', routeName: 'admin.settings.index' },
+                  { label: 'Settings', routeName: 'admin.settings.index' },
               ]
             : [
                   { label: 'Dashboard', routeName: 'user.dashboard' },
