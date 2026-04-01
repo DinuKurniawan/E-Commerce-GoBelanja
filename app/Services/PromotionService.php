@@ -333,8 +333,18 @@ class PromotionService
     public function getAvailablePromotions(Collection $cartItems, User $user): Collection
     {
         $subtotal = $this->calculateCartSubtotal($cartItems);
-        $categoryIds = $cartItems->pluck('product.category_id')->unique()->toArray();
-        $productIds = $cartItems->pluck('product_id')->toArray();
+        $categoryIds = $cartItems
+            ->map(fn ($item) => $this->getCartItemCategoryId($item))
+            ->filter(fn ($id) => $id !== null)
+            ->unique()
+            ->values()
+            ->toArray();
+
+        $productIds = $cartItems
+            ->map(fn ($item) => $this->getCartItemProductId($item))
+            ->filter(fn ($id) => $id !== null)
+            ->values()
+            ->toArray();
 
         return Promotion::active()
             ->where(function ($query) use ($subtotal, $categoryIds, $productIds, $user) {
@@ -370,7 +380,10 @@ class PromotionService
     protected function calculateCartSubtotal(Collection $cartItems): int
     {
         return $cartItems->sum(function ($item) {
-            return $item->product->price * $item->quantity;
+            $price = (int) data_get($item, 'product.price', 0);
+            $quantity = max((int) data_get($item, 'quantity', 0), 0);
+
+            return $price * $quantity;
         });
     }
 
@@ -382,13 +395,14 @@ class PromotionService
 
         if ($promotion->applies_to === 'category' && $promotion->category_id) {
             return $cartItems->filter(function ($item) use ($promotion) {
-                return $item->product->category_id == $promotion->category_id;
+                return $this->getCartItemCategoryId($item) == $promotion->category_id;
             });
         }
 
         if ($promotion->applies_to === 'product' && $promotion->applicable_product_ids) {
             return $cartItems->filter(function ($item) use ($promotion) {
-                return in_array($item->product_id, $promotion->applicable_product_ids);
+                $productId = $this->getCartItemProductId($item);
+                return $productId !== null && in_array($productId, $promotion->applicable_product_ids);
             });
         }
 
@@ -406,5 +420,17 @@ class PromotionService
 
             $promotion->incrementUsageCount();
         });
+    }
+
+    protected function getCartItemProductId(mixed $item): ?int
+    {
+        $id = data_get($item, 'product_id', data_get($item, 'product.id'));
+        return is_numeric($id) ? (int) $id : null;
+    }
+
+    protected function getCartItemCategoryId(mixed $item): ?int
+    {
+        $id = data_get($item, 'product.category_id');
+        return is_numeric($id) ? (int) $id : null;
     }
 }
