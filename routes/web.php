@@ -54,10 +54,29 @@ use App\Http\Controllers\User\DeliveryScheduleController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\Admin\ReturnRequestManagementController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 // Locale Routes (Public)
 Route::post('/locale', [LocaleController::class, 'setLocale'])->name('locale.set');
 Route::get('/locale', [LocaleController::class, 'getLocale'])->name('locale.get');
+
+// Shared hosting fallback for /storage URLs when public/storage symlink is unavailable.
+Route::get('/storage/{path}', function (string $path) {
+    $normalizedPath = ltrim(str_replace('\\', '/', $path), '/');
+
+    if ($normalizedPath === '' || str_contains($normalizedPath, '..')) {
+        abort(404);
+    }
+
+    $disk = Storage::disk('public');
+    if (! $disk->exists($normalizedPath)) {
+        abort(404);
+    }
+
+    return response()->file($disk->path($normalizedPath), [
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*')->name('storage.fallback');
 
 Route::get('/', [HomeController::class, 'index']);
 
