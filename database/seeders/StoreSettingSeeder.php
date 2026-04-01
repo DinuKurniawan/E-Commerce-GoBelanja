@@ -17,7 +17,7 @@ class StoreSettingSeeder extends Seeder
             [
                 'store_name' => 'GoBelanja',
                 'store_logo' => null,
-                'payment_method' => 'Transfer Bank, E-Wallet, COD',
+                'payment_method' => 'Midtrans (Online Payment), Transfer Bank, E-Wallet, COD',
                 'api_key' => null,
             ],
         );

@@ -43,6 +43,7 @@ use App\Http\Controllers\User\UserWishlistController;
 use App\Http\Controllers\User\UserChatController;
 use App\Http\Controllers\User\PreOrderController;
 use App\Http\Controllers\User\TwoFactorController;
+use App\Http\Controllers\User\MidtransController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\IpBlockingController;
 use App\Http\Controllers\Admin\SecurityDashboardController;
@@ -97,6 +98,9 @@ Route::get('/newsletter/resubscribe/{token}', [NewsletterController::class, 'res
 // Email Tracking Routes (Public)
 Route::get('/email/track/open/{campaign}/{email}', [EmailTrackingController::class, 'trackOpen'])->name('email.track.open');
 Route::get('/email/track/click/{campaign}/{email}', [EmailTrackingController::class, 'trackClick'])->name('email.track.click');
+
+// Midtrans Webhook (Public - untuk menerima notifikasi dari Midtrans)
+Route::post('/midtrans/notification', [\App\Http\Controllers\User\MidtransController::class, 'notification'])->name('midtrans.notification');
 
 // Raja Ongkir proxy (requires auth to prevent API abuse)
 Route::middleware('auth')->prefix('rajaongkir')->name('rajaongkir.')->group(function () {
@@ -356,6 +360,10 @@ Route::middleware(['auth', 'verified', 'role:user'])
 
         Route::get('/payments', [UserPaymentController::class, 'index'])->name('payments.index');
         Route::patch('/payments/{payment}/proof', [UserPaymentController::class, 'uploadProof'])->name('payments.upload-proof');
+
+        // Midtrans Payment Routes
+        Route::post('/midtrans/create-snap-token/{order}', [\App\Http\Controllers\User\MidtransController::class, 'createSnapToken'])->name('midtrans.create-snap-token');
+        Route::get('/midtrans/check-status/{order}', [\App\Http\Controllers\User\MidtransController::class, 'checkStatus'])->name('midtrans.check-status');
 
         Route::get('/reviews', [UserReviewController::class, 'index'])->name('reviews.index');
         Route::post('/reviews', [UserReviewController::class, 'store'])->name('reviews.store');

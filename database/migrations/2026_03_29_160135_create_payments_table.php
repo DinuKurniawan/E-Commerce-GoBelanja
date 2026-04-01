@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('method');
             $table->enum('status', ['pending', 'paid', 'failed'])->default('pending');
             $table->string('proof_image')->nullable();
+            $table->string('snap_token')->nullable();
+            $table->string('transaction_id')->nullable();
+            $table->string('payment_type')->nullable();
             $table->unsignedInteger('amount');
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

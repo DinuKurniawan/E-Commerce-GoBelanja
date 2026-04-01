@@ -4,6 +4,13 @@ A comprehensive Laravel 13 + Inertia.js + React e-commerce platform with powerfu
 
 ## 🎯 Key Features
 
+### 💳 Payment Gateway (NEW!)
+- **Midtrans Integration** - Complete payment gateway integration with Snap API
+- **Multiple Payment Methods** - Bank Transfer, Credit Card, E-Wallet, Convenience Store
+- **Automatic Status Update** - Webhook notification for real-time payment status
+- **Secure Transactions** - 3D Secure and fraud detection
+- **Sandbox Testing** - Full testing environment ready
+
 ### 🔄 Bulk Operations System (NEW!)
 - **Product Import/Export** - Import hundreds of products from CSV with validation
 - **Bulk Price Updates** - Update prices by percentage or fixed amount
@@ -160,6 +167,41 @@ Upload CSV → Get instant feedback → Done!
 2. Set date range: Dec 1 - Dec 31
 3. Export → Instant CSV download
 4. Open in Excel for analysis
+
+## 💳 Midtrans Payment Gateway
+
+Complete integration with Midtrans payment gateway for seamless online payments.
+
+### Features
+- **Multiple Payment Methods**: Bank Transfer, Credit Card, E-Wallet (GoPay, OVO, DANA), Convenience Store
+- **Secure Transactions**: 3D Secure authentication and fraud detection
+- **Automatic Status Update**: Real-time payment notification via webhook
+- **Sandbox Testing**: Full testing environment with test credentials
+
+### Setup Status
+✅ **READY TO USE** - Midtrans is fully configured via environment variables:
+- Merchant ID: `MIDTRANS_MERCHANT_ID`
+- Environment: Sandbox (Testing) / Production
+- Snap API: Integrated
+- Webhook: Configured
+
+### Quick Test
+1. Checkout with "Midtrans (Online Payment)" as payment method
+2. Click "💳 Bayar Sekarang" button on order detail page
+3. Choose payment method in Midtrans popup
+4. Use test credentials for sandbox testing:
+   - **Credit Card**: 4811 1111 1111 1114 / 01/25 / 123
+   - **OTP**: 112233
+
+### Documentation
+📚 Complete setup guide: [MIDTRANS_SETUP.md](./MIDTRANS_SETUP.md)
+
+### Switching to Production
+When ready for production:
+1. Update `.env` with production credentials
+2. Set `MIDTRANS_IS_PRODUCTION=true`
+3. Update webhook URL in Midtrans Dashboard
+4. Run `php artisan config:cache`
 
 ## 🔒 Security Features
 

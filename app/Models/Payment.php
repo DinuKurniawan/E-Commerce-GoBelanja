@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\Model;
     'method',
     'status',
     'proof_image',
+    'snap_token',
+    'transaction_id',
+    'payment_type',
     'amount',
     'paid_at',
 ])]

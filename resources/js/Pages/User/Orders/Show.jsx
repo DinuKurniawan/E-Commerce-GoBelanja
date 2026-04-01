@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import MidtransPaymentButton from '@/Components/MidtransPaymentButton';
 
 const STATUS_COLOR = {
     pending:              'bg-yellow-100 text-yellow-700',
@@ -618,6 +619,9 @@ export default function UserOrderShow({ order, userReviews, returnRequests }) {
                             </p>
                         </div>
                     )}
+
+                    {/* Midtrans Payment Button */}
+                    <MidtransPaymentButton order={order} payment={payment} />
 
                     {/* Upload bukti transfer */}
                     {(needsProof || canReupload) && (
