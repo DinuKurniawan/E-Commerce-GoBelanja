@@ -43,11 +43,10 @@ class ProductSearchController extends Controller
 
         // Rating filter
         if ($minRating !== null) {
-            $query->whereHas('reviews', function ($q) use ($minRating) {
-                $q->selectRaw('AVG(rating)')
-                    ->groupBy('product_id')
-                    ->havingRaw('AVG(rating) >= ?', [$minRating]);
-            });
+            $query->whereRaw(
+                '(SELECT AVG(reviews.rating) FROM reviews WHERE reviews.product_id = products.id) >= ?',
+                [$minRating]
+            );
         }
 
         // Availability filter
